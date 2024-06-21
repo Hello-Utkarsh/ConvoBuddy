@@ -1,113 +1,45 @@
 import Image from "next/image";
 
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <div className="px-7">
+      <header className="flex justify-between items-center text-[#FFD369] h-[7vh]">
+        <h1 className="text-2xl font-medium tracking-tighter">ConvoBuddy</h1>
+        <button className="bg-[#393E46] text-lg px-4 py-2 rounded-xl">Login</button>
+      </header>
+      <main>
+        <section className="text-[#FFD369] flex items-center justify-between h-[93vh]">
+          <div className="flex flex-col w-[45%]">
+            <h1 className="text-[55px] leading-none text-pretty font-['Manrope'] tracking-tighter font-semibold">Platform To Enhance Your Communictaion Skills</h1>
+            <h3 className="text-[#EEEEEE] text-[22px] leading-tight my-4 ">Connect with random individuals who are<br />learning the same language and practice through<br />real conversation</h3>
+          </div>
+          <img className="aspect-auto w-[52%]" src="vc_pic.jpg" alt="" />
+        </section>
+        <section className="bg-[#393E46] flex flex-col py-8">
+          <p className="text-[#222831] bg-[#FFD369] rounded-lg mx-auto px-3 py-1 w-fit">Key Feature</p>
+          <h1 className="mx-auto text-[#FFD369] text-5xl font-semibold tracking-tight mt-4">Enhance Your Communication</h1>
+          <p className="mx-auto text-[#EEEEEE] mt-2 text-lg tracking-tight">ConvoBuddy offers a lot of feature to improve your communication skills as well as increase your vocabulary</p>
+          <div className="flex flex-wrap justify-around mt-8 w-[85%] mx-auto">
+            <div className="bg-[#222831] w-[24%] rounded-lg text-center h-fit py-5 px-3">
+              <h5 className="text-[#FFD369] mx-auto text-lg tracking-tight font-medium">One on One Convos</h5>
+              <p className="text-[#EEEEEE] mx-auto text-pretty mt-1">Connect with random individuals who are learning the same language and practice through real conversation</p>
+            </div>
+            <div className="bg-[#222831] w-[22%] rounded-lg text-center h-fit py-4 px-3">
+              <h5 className="text-[#FFD369] mx-auto text-lg tracking-tight font-medium">Word of the Days</h5>
+              <p className="text-[#EEEEEE] mx-auto text-pretty mt-1">Learn new words everyday. Keep the difficult ones always in front of your eyes using our notes</p>
+            </div>
+            <div className="bg-[#222831] w-[22%] rounded-lg text-center h-fit py-4 px-3">
+              <h5 className="text-[#FFD369] mx-auto text-lg tracking-tight font-medium">Pitches</h5>
+              <p className="text-[#EEEEEE] mx-auto text-pretty mt-1">Having a presentation? Practice it before hand, with the poeple interested in your idea</p>
+            </div>
+            <div className="bg-[#222831] w-[20%] rounded-lg text-center h-fit py-4 px-3">
+              <h5 className="text-[#FFD369] mx-auto text-lg tracking-tight font-medium">Daily Analysis</h5>
+              <p className="text-[#EEEEEE] mx-auto text-pretty mt-1">Get complete anaylysis of how many hours you spent in practicing each language</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div >
   );
 }
