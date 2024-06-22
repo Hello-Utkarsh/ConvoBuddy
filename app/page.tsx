@@ -1,12 +1,35 @@
-import Image from "next/image";
+'use client'
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  useUser
+} from '@clerk/nextjs'
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 
 export default function Home() {
+  const { isSignedIn } = useUser()
+  const router = useRouter()
+  useEffect(() => {
+    if (isSignedIn) {
+      router.push('/dashboard')
+    }
+  })
   return (
     <div className="px-7">
       <header className="flex justify-between items-center text-[#FFD369] h-[7vh]">
         <h1 className="text-2xl font-medium tracking-tighter">ConvoBuddy</h1>
-        <button className="bg-[#393E46] text-lg px-4 py-2 rounded-xl">Login</button>
+        <div className="text-lg px-3 py-1 rounded-xl">
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </div>
       </header>
       <main>
         <section className="text-[#FFD369] flex items-center justify-between h-[93vh]">
@@ -39,6 +62,40 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <footer className='flex justify-between items-center px-8 py-8 mt-16'>
+          <div className='flex flex-col w-3/6'>
+            <div className='flex flex-col'>
+              <h1 className='text-[#FFD369] text-[55px] font-semibold my-1 tracking-tighter leading-none'>Take your communication skills to the next level</h1>
+              <p className='text-[#EEEEEE] text-[22px] my-1'>ConvoBuddy empowers you with tools to make your virtual meetings more effective.</p>
+            </div>
+            <div className="px-4 py-2 w-fit rounded-xl text-[#FFD369] bg-[#393E46]">
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </div>
+          </div>
+          <div className='w-2/6 bg-[#393E46] justify-center mr-10 rounded-xl py-4 flex flex-col'>
+            <h1 className='text-[#FFD369] text-xl font-semibold my-2 mx-auto'>Contact us</h1>
+            <div className='flex flex-col mx-auto w-4/6'>
+              <div className='flex flex-col my-2'>
+                <label className='text-[#EEEEEE]' htmlFor="">Name</label>
+                <input className='rounded-xl text-[#222831] px-3 mt-1' type="text" />
+              </div>
+              <div className='flex flex-col my-2'>
+                <label className='text-[#EEEEEE]' htmlFor="">Email</label>
+                <input className='rounded-xl text-[#222831] px-3 mt-1' type="text" />
+              </div>
+              <div className='flex flex-col my-2'>
+                <label className='text-[#EEEEEE]' htmlFor="">Message</label>
+                <textarea className='rounded-xl text-[#222831] px-3 mt-1' name="" id=""></textarea>
+              </div>
+              <button className='bg-[#222831] px-4 py-2 rounded-xl text-[#FFD369] mx-auto mt-2'>Submit</button>
+            </div>
+          </div>
+        </footer>
       </main>
     </div >
   );
