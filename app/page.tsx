@@ -6,6 +6,7 @@ import {
   UserButton,
   useUser
 } from '@clerk/nextjs'
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -37,7 +38,7 @@ export default function Home() {
             <h1 className="text-[55px] leading-none text-pretty font-['Manrope'] tracking-tighter font-semibold">Platform To Enhance Your Communictaion Skills</h1>
             <h3 className="text-[#EEEEEE] text-[22px] leading-tight my-4 ">Connect with random individuals who are<br />learning the same language and practice through<br />real conversation</h3>
           </div>
-          <img className="aspect-auto w-[52%]" src="vc_pic.jpg" alt="" />
+          <Image width={500} height={500} className="w-[52%]" src="/vc_pic.jpg" alt="" />
         </section>
         <section className="bg-[#393E46] flex flex-col py-8">
           <p className="text-[#222831] bg-[#FFD369] rounded-lg mx-auto px-3 py-1 w-fit">Key Feature</p>
