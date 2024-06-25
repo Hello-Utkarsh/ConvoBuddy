@@ -77,22 +77,22 @@ export default function Home() {
               </SignedIn>
             </div>
           </div>
-          <div className='w-2/6 bg-[#393E46] justify-center mr-10 rounded-xl py-4 flex flex-col'>
-            <h1 className='text-[#FFD369] text-xl font-semibold my-2 mx-auto'>Contact us</h1>
+          <div className='w-2/6 bg-[#393E46]  justify-center mr-10 rounded-xl py-4 flex flex-col'>
+            <h1 className='text-[#FFD369] text-2xl font-semibold my-2 w-4/6 mx-auto'>Contact us</h1>
             <div className='flex flex-col mx-auto w-4/6'>
               <div className='flex flex-col my-2'>
                 <label className='text-[#EEEEEE]' htmlFor="">Name</label>
-                <input className='rounded-xl text-[#222831] px-3 mt-1' type="text" />
+                <input className='rounded-xl text-[#EEEEEE] bg-[#393E46] border-[#EEEEEE] border-2 px-3 mt-1' type="text" />
               </div>
               <div className='flex flex-col my-2'>
                 <label className='text-[#EEEEEE]' htmlFor="">Email</label>
-                <input className='rounded-xl text-[#222831] px-3 mt-1' type="text" />
+                <input className='rounded-xl text-[#EEEEEE] bg-[#393E46] border-[#EEEEEE] border-2 px-3 mt-1' type="text" />
               </div>
               <div className='flex flex-col my-2'>
                 <label className='text-[#EEEEEE]' htmlFor="">Message</label>
-                <textarea className='rounded-xl text-[#222831] px-3 mt-1' name="" id=""></textarea>
+                <textarea className='rounded-xl text-[#EEEEEE] bg-[#393E46] border-[#EEEEEE] border-2 px-3 mt-1' name="" id=""></textarea>
               </div>
-              <button className='bg-[#222831] px-4 py-2 rounded-xl text-[#FFD369] mx-auto mt-2'>Submit</button>
+              <button className='bg-[#222831] px-4 py-2 rounded-xl text-[#FFD369] w-fit mt-2 ml-[66%]'>Submit</button>
             </div>
           </div>
         </footer>
