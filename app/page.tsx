@@ -14,11 +14,13 @@ import { useEffect } from 'react';
 export default function Home() {
   const { isSignedIn } = useUser()
   const router = useRouter()
+
   useEffect(() => {
     if (isSignedIn) {
       router.push('/dashboard')
     }
   })
+  
   return (
     <div className="px-7">
       <header className="flex justify-between items-center text-[#FFD369] h-[7vh]">
