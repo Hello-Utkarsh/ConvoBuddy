@@ -14,38 +14,23 @@ const Page = () => {
       word: "Quixotic",
       meaning: "Adjective: exceedingly idealistic; unrealistic and impractical.",
       use: "Despite the quixotic nature of his plan to build a sustainable city on Mars, he managed to gather a small but passionate group of supporters"
-    },
-    {
-      word: "Quixotic",
-      meaning: "Adjective: exceedingly idealistic; unrealistic and impractical.",
-      use: "Despite the quixotic nature of his plan to build a sustainable city on Mars, he managed to gather a small but passionate group of supporters"
-    },
-    {
-      word: "Quixotic",
-      meaning: "Adjective: exceedingly idealistic; unrealistic and impractical.",
-      use: "Despite the quixotic nature of his plan to build a sustainable city on Mars, he managed to gather a small but passionate group of supporters"
-    },
-    // {
-    //   word: "Quixotic",
-    //   meaning: "Adjective: exceedingly idealistic; unrealistic and impractical.",
-    //   use: "Despite the quixotic nature of his plan to build a sustainable city on Mars, he managed to gather a small but passionate group of supporters"
-    // }
+    }
   ]
 
   return (
     <div className='flex'>
       <Sidebar />
-      <div className='w-[63%] divide-y-4 divide-[#393E46] overflow-y-auto'>
+      <div className='w-[63%] divide-y-4 divide-[#393E46] h-[100vh] overflow-y-auto'>
         <div className='w-full py-8 px-4 flex items-center justify-around'>
           <div className='flex flex-col w-6/12'>
             <h1 className='text-[#FFD369] text-3xl font-medium'>Your Language Usage</h1>
-            <p className='text-[#EEEEEE]'>See how you've been spending your time practicing different languages.</p>
+            <p className='text-[#EEEEEE]'>See how you&quot;ve been spending your time practicing different languages.</p>
           </div>
           <div className='h-fit w-fit'>
-            <Doughnut 
+            <Doughnut className='h-24'
             data={{
               labels: [
-                'Red',
+                'hello',
                 'Blue',
                 'Yellow',
               ],
@@ -57,7 +42,6 @@ const Page = () => {
                   'rgb(238, 238, 238)',
                   'rgb(57, 62, 70)',
                 ],
-                // hoverOffset: 4
               }]
             }} />
           </div>
