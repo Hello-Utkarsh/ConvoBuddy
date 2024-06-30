@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
-import Sidebar from '../components/Sidebar'
-import WordOfTheDay from '../components/WordOfTheDay'
-import Pitches from '../components/Pitches'
-import NoteCard from '../components/NoteCard'
+import Sidebar from '../../components/Sidebar'
+import WordOfTheDay from '../../components/WordOfTheDay'
+import Pitches from '../../components/Pitches'
+import NoteCard from '../../components/NoteCard'
 import { Doughnut } from 'react-chartjs-2'
 import { ArcElement, Chart } from 'chart.js'
 
@@ -18,16 +18,15 @@ const Page = () => {
   ]
 
   return (
-    <div className='flex'>
-      <Sidebar />
-      <div className='w-[63%] divide-y-4 divide-[#393E46] h-[100vh] overflow-y-auto'>
-        <div className='w-full py-8 px-4 flex items-center justify-around'>
+    <div className='flex ml-[12%]'>
+      <div className='divide-y-4 divide-[#393E46] w-full h-[100vh] overflow-y-auto'>
+        <div className='w-full py-8 px-4 flex items-center justify-around h-[50vh]'>
           <div className='flex flex-col w-6/12'>
-            <h1 className='text-[#FFD369] text-3xl font-medium'>Your Language Usage</h1>
-            <p className='text-[#EEEEEE]'>See how you&quot;ve been spending your time practicing different languages.</p>
+            <h1 className='text-[#FFD369] text-3xl font-medium'>Language Activity Report</h1>
+            <p className='text-[#EEEEEE]'>See how you&#39;ve been spending your time practicing different languages.</p>
           </div>
           <div className='h-fit w-fit'>
-            <Doughnut className='h-24'
+            <Doughnut className='h-32'
             data={{
               labels: [
                 'hello',
@@ -55,7 +54,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <div className='flex flex-col w-[25%] h-[100vh] divide-y-4 divide-[#222831] bg-[#393E46]'>
+      <div className='flex flex-col w-[37%] h-[100vh] divide-y-4 divide-[#222831] bg-[#393E46]'>
         <WordOfTheDay />
         <Pitches />
       </div>
