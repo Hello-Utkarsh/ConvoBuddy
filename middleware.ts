@@ -1,7 +1,16 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { auth, clerkMiddleware, getAuth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export default clerkMiddleware();
+export default clerkMiddleware((auth, req) => {
+  if (req.method !== "GET") {
+        const { userId } = auth();
+    
+        if (!userId) {
+          return NextResponse.json({ error: "Unauthorized" });
+        }
 
-export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
-};
+        return NextResponse.json({ message: "This is a protected POST route" });
+      }
+    
+      NextResponse.json({ message: "This is an unprotected route" });
+});

@@ -1,16 +1,29 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Sidebar from '../../components/Sidebar'
 import WordOfTheDay from '../../components/WordOfTheDay'
 import Pitches from '../../components/Pitches'
 import NoteCard from '../../components/NoteCard'
 import { Doughnut } from 'react-chartjs-2'
 import { ArcElement, Chart } from 'chart.js'
+import { useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 
 const Page = () => {
+  const { isSignedIn } = useUser()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      router.push('/')
+    }
+  })
+
   Chart.register(ArcElement);
+
   const words = [
     {
+      id: "1",
       word: "Quixotic",
       meaning: "Adjective: exceedingly idealistic; unrealistic and impractical.",
       use: "Despite the quixotic nature of his plan to build a sustainable city on Mars, he managed to gather a small but passionate group of supporters"
@@ -35,7 +48,7 @@ const Page = () => {
               ],
               datasets: [{
                 label: 'My First Dataseteee',
-                data: [300, 50, 100],
+                data: [100],
                 backgroundColor: [
                   'rgb(255 211 105)',
                   'rgb(238, 238, 238)',
@@ -49,7 +62,7 @@ const Page = () => {
           <h1 className='text-[#FFD369] text-3xl font-medium my-2  w-fit mx-auto'>Notes</h1>
           <div className='w-full px-4 grid grid-cols-3'>
             {words ? words.map((item) => {
-              return <NoteCard item={item} />
+              return <NoteCard key = {item.id} item={item} />
             }) : null}
           </div>
         </div>

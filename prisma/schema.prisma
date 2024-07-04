@@ -13,20 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id Int @id @default(autoincrement())
+  userid String
+  registeredId Int
+  registered Pitch @relation(fields: [registeredId], references: [id])
+}
+
+
 
 model Pitch {
   id Int @id @default(autoincrement())
+  createdId String
   title String
   description String
   startDate DateTime
   registered Int @default(0)
   user User[]
-}
-
-model User {
-  id Int @id @default(autoincrement())
-  registered Boolean
-  created Boolean
-  pitchId Int
-  pitch Pitch @relation(fields: [pitchId], references: [id])
 }

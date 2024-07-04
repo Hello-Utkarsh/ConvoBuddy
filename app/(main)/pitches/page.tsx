@@ -1,12 +1,24 @@
 'use client'
 import PitchCard from '@/app/components/PitchCard'
-import React, { useState } from 'react'
+import { useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { MdOutlinePeopleAlt } from 'react-icons/md'
 
 const LeaderBoard = () => {
   const [dropdown, setDropdown] = useState(false)
   const [createDialog, setDialog] = useState(false)
+
+  const { isSignedIn } = useUser()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      router.push('/')
+    }
+  })
+
   const {
     register,
     handleSubmit,
@@ -14,8 +26,20 @@ const LeaderBoard = () => {
     formState: { errors },
   } = useForm()
 
+  const getPitches = async () => {
+    const req = await fetch('/api/pitches', {
+      method: 'GET'
+    })
+    const pitches = await req.json()
+    console.log(pitches)
+  }
+
+  useEffect(() => {
+    getPitches()
+  })
+
   const onSubmit = (data: any) => {
-    
+
   }
 
   return (
@@ -82,6 +106,12 @@ const LeaderBoard = () => {
       </div>
       <div className='flex p-4 items-center justify-between'>
         <h1 className='text-3xl font-bold text-[#FFD369]'>Registerd Pitches</h1>
+      </div>
+      <div className='p-4 grid grid-cols-4 gap-4'>
+        <PitchCard />
+      </div>
+      <div className='flex p-4 items-center justify-between'>
+        <h1 className='text-3xl font-bold text-[#FFD369]'>All Pitches</h1>
       </div>
       <div className='p-4 grid grid-cols-4 gap-4'>
         <PitchCard />
