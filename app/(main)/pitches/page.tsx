@@ -4,20 +4,57 @@ import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { MdOutlinePeopleAlt } from 'react-icons/md'
 
 const LeaderBoard = () => {
   const [dropdown, setDropdown] = useState(false)
   const [createDialog, setDialog] = useState(false)
+  const [pitches, setPitches] = useState([])
+  const [userpitch, setUserPitch] = useState([])
+  const [registeredpitch, setRegisteredPitch] = useState([])
 
   const { isSignedIn } = useUser()
   const router = useRouter()
+
+  const get_all_pitches = async () => {
+    const req = await fetch('/api/pitches', {
+      method: "GET"
+    })
+
+    const content = await req.json()
+    if (content.message == 'success') {
+      setPitches(content.pitches)
+    }
+  }
+
+  const get_user_pitch = async () => {
+    const req = await fetch('/api/pitches/userpitch', {
+      method: 'GET'
+    })
+
+    const content = await req.json()
+    if (content.message == 'success') {
+      setUserPitch(content.user_pitch)
+    }
+  }
+
+  const get_registered_pitch = async () => {
+    const req = await fetch('/api/pitches/registered', {
+      method: 'GET'
+    })
+
+    const content = await req.json()
+    console.log(content.registered_pitch)
+    setRegisteredPitch(content.registered_pitch)
+  }
 
   useEffect(() => {
     if (!isSignedIn) {
       router.push('/')
     }
-  })
+    get_all_pitches()
+    get_user_pitch()
+    get_registered_pitch()
+  }, [])
 
   const {
     register,
@@ -25,18 +62,6 @@ const LeaderBoard = () => {
     watch,
     formState: { errors },
   } = useForm()
-
-  const getPitches = async () => {
-    const req = await fetch('/api/pitches', {
-      method: 'GET'
-    })
-    const pitches = await req.json()
-    console.log(pitches)
-  }
-
-  useEffect(() => {
-    getPitches()
-  })
 
   const onSubmit = (data: any) => {
 
@@ -102,19 +127,19 @@ const LeaderBoard = () => {
         </div>
       </div>
       <div className='p-4 grid grid-cols-4 gap-4'>
-        <PitchCard />
+        {userpitch.length > 0 ? userpitch.map(pitch => { return <PitchCard pitch={pitch} /> }) : <div>no</div>}
       </div>
       <div className='flex p-4 items-center justify-between'>
         <h1 className='text-3xl font-bold text-[#FFD369]'>Registerd Pitches</h1>
       </div>
       <div className='p-4 grid grid-cols-4 gap-4'>
-        <PitchCard />
+      {registeredpitch.length > 0 ? registeredpitch.map((pitch: any) => { return <PitchCard pitch={pitch.registered} /> }) : <div>no</div>}
       </div>
       <div className='flex p-4 items-center justify-between'>
         <h1 className='text-3xl font-bold text-[#FFD369]'>All Pitches</h1>
       </div>
       <div className='p-4 grid grid-cols-4 gap-4'>
-        <PitchCard />
+        {pitches.length > 0 ? pitches.map(pitch => { return <PitchCard pitch={pitch} /> }) : <div>no</div>}
       </div>
     </div >
   )

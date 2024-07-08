@@ -1,23 +1,12 @@
 'use client'
 import React, { useEffect } from 'react'
-import Sidebar from '../../components/Sidebar'
 import WordOfTheDay from '../../components/WordOfTheDay'
 import Pitches from '../../components/Pitches'
 import NoteCard from '../../components/NoteCard'
 import { Doughnut } from 'react-chartjs-2'
 import { ArcElement, Chart } from 'chart.js'
-import { useUser } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
 
 const Page = () => {
-  const { isSignedIn } = useUser()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!isSignedIn) {
-      router.push('/')
-    }
-  })
 
   Chart.register(ArcElement);
 

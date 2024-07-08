@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   const request = await prisma.pitch.create({
     data: {
-      createdId: body.id,
+      createdId: body.createdId,
       title: body.title,
       description: body.description,
       startDate: dateTime,
