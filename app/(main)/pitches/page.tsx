@@ -12,9 +12,6 @@ const LeaderBoard = () => {
   const [userpitch, setUserPitch] = useState([])
   const [registeredpitch, setRegisteredPitch] = useState([])
 
-  const { isSignedIn } = useUser()
-  const router = useRouter()
-
   const get_all_pitches = async () => {
     const req = await fetch('/api/pitches', {
       method: "GET"
@@ -43,14 +40,10 @@ const LeaderBoard = () => {
     })
 
     const content = await req.json()
-    console.log(content.registered_pitch)
     setRegisteredPitch(content.registered_pitch)
   }
 
   useEffect(() => {
-    if (!isSignedIn) {
-      router.push('/')
-    }
     get_all_pitches()
     get_user_pitch()
     get_registered_pitch()
@@ -63,8 +56,29 @@ const LeaderBoard = () => {
     formState: { errors },
   } = useForm()
 
-  const onSubmit = (data: any) => {
-
+  const onSubmit = async (data: any) => {
+    try {
+      const req = await fetch('/api/pitches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'applictaion/json',
+        },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          date: data.date,
+          time: data.time
+        })
+      })
+      
+      const response = await req.json()
+      console.log(response)
+      if (response.message == 'success') {
+        return alert('success')
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -127,19 +141,19 @@ const LeaderBoard = () => {
         </div>
       </div>
       <div className='p-4 grid grid-cols-4 gap-4'>
-        {userpitch.length > 0 ? userpitch.map(pitch => { return <PitchCard pitch={pitch} /> }) : <div>no</div>}
+        {userpitch.length > 0 ? userpitch.map((pitch: any) => { return <PitchCard pitch={pitch} isUser={true} key={pitch.id} /> }) : <div>no</div>}
       </div>
       <div className='flex p-4 items-center justify-between'>
         <h1 className='text-3xl font-bold text-[#FFD369]'>Registerd Pitches</h1>
       </div>
       <div className='p-4 grid grid-cols-4 gap-4'>
-      {registeredpitch.length > 0 ? registeredpitch.map((pitch: any) => { return <PitchCard pitch={pitch.registered} /> }) : <div>no</div>}
+        {registeredpitch.length > 0 ? registeredpitch.map((pitch: any) => { return <PitchCard isRegistered={true} pitch={pitch.registered} key={pitch.registered.id} /> }) : <div>no</div>}
       </div>
       <div className='flex p-4 items-center justify-between'>
         <h1 className='text-3xl font-bold text-[#FFD369]'>All Pitches</h1>
       </div>
       <div className='p-4 grid grid-cols-4 gap-4'>
-        {pitches.length > 0 ? pitches.map(pitch => { return <PitchCard pitch={pitch} /> }) : <div>no</div>}
+        {pitches.length > 0 ? pitches.map((pitch: any) => { return <PitchCard pitch={pitch} key={pitch.id} /> }) : <div>no</div>}
       </div>
     </div >
   )

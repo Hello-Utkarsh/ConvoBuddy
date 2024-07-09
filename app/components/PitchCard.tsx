@@ -1,8 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { MdOutlinePeopleAlt } from 'react-icons/md'
+import { Button } from "@/components/ui/button"
 
 const PitchCard = (props: any) => {
     const [date, setDate] = useState('')
+
+    const delPitch = async(id: number) => {
+        const req = await fetch('/api/pitches', {
+            method: 'DELETE',
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        const res = await req.json()
+        if (res.message != 'success') {
+            return alert('Please try again')
+        }
+    }
 
     useEffect(() => {
         if (props.pitch?.startDate) {
@@ -21,11 +35,10 @@ const PitchCard = (props: any) => {
             });
             setDate(formattedDate)
         }
-
-    }, [])
+    })
 
     return (
-        <div className='bg-[#393E46] rounded-lg flex flex-col h-fit px-4 py-2'>
+        <div className='bg-[#393E46] rounded-lg flex flex-col justify-between px-4 py-2'>
             <div className='flex items-center justify-between my-1'>
                 <h2 className='text-xl tracking-tighter w-7/12 text-[#EEEEEE] font-semibold'>{props.pitch?.title}</h2>
                 <p className='text-[#EEEEEE] font-semibold text-sm tracking-tighter w-4/12'>{date}</p>
@@ -36,7 +49,10 @@ const PitchCard = (props: any) => {
                     <p className='mr-1'>{props.pitch?.registered}</p>
                     <MdOutlinePeopleAlt />
                 </span>
-                <button className='text-[#EEEEEE] bg-[#222831] px-3 py-1 rounded-md hover:scale-110 transition duration-150'>Join</button>
+                <div>
+                    {props.isUser ? <Button onClick={()=>{delPitch(props.pitch.id)}} className='bg-[#222831] h-fit py-2 px-3 mr-2'>Delete</Button> : null}
+                    {props.isRegistered ? <Button className='bg-[#222831] h-fit py-2 px-3'>Unenroll</Button> : <Button className='bg-[#222831] h-fit py-2 px-3'>Join</Button>}
+                </div>
             </div>
         </div>
     )

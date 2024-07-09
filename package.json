@@ -11,7 +11,11 @@
   "dependencies": {
     "@clerk/nextjs": "^5.1.6",
     "@prisma/client": "^5.15.1",
+    "@radix-ui/react-slot": "^1.1.0",
     "chart.js": "^4.4.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.406.0",
     "material-icons": "^1.13.12",
     "next": "14.2.4",
     "prisma": "^5.15.1",
@@ -19,7 +23,9 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
     "react-hook-form": "^7.52.0",
-    "react-icons": "^5.2.1"
+    "react-icons": "^5.2.1",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",

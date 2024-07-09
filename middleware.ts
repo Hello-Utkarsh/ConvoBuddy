@@ -9,7 +9,7 @@ export default clerkMiddleware((auth, req) => {
           return NextResponse.json({ error: "Unauthorized" });
         }
 
-        return NextResponse.json({ message: "This is a protected POST route" });
+        return NextResponse.next()
       }
     
       NextResponse.json({ message: "This is an unprotected route" });
