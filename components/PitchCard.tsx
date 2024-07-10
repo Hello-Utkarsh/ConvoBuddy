@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { MdOutlinePeopleAlt } from 'react-icons/md'
 import { Button } from "@/components/ui/button"
+import { useUser } from '@clerk/nextjs'
+import { enroll, unenroll } from '@/actions/useraction'
 
 const PitchCard = (props: any) => {
     const [date, setDate] = useState('')
+    const user: any = useUser()
 
-    const delPitch = async(id: number) => {
-        const req = await fetch('/api/pitches', {
-            method: 'DELETE',
-            body: JSON.stringify({
-                id: id
+    const delPitch = async(id: number, createdId: string) => {
+        try {
+            const req = await fetch('/api/pitches', {
+                method: 'DELETE',
+                body: JSON.stringify({
+                    id: id,
+                    createdId
+                })
             })
-        })
-        const res = await req.json()
-        if (res.message != 'success') {
-            return alert('Please try again')
+            const res = await req.json()
+            if (res.message != 'success') {
+                return alert(res.message)
+            }
+        } catch (error: any) {
+            console.log(error.message)
         }
     }
 
@@ -50,8 +58,8 @@ const PitchCard = (props: any) => {
                     <MdOutlinePeopleAlt />
                 </span>
                 <div>
-                    {props.isUser ? <Button onClick={()=>{delPitch(props.pitch.id)}} className='bg-[#222831] h-fit py-2 px-3 mr-2'>Delete</Button> : null}
-                    {props.isRegistered ? <Button className='bg-[#222831] h-fit py-2 px-3'>Unenroll</Button> : <Button className='bg-[#222831] h-fit py-2 px-3'>Join</Button>}
+                    {props.isUser ? <Button onClick={()=>{delPitch(props.pitch.id, props.pitch.createdId)}} className='bg-[#222831] h-fit py-2 px-3 mr-2'>Delete</Button> : null}
+                    {props.isRegistered ? <Button onClick={()=>{unenroll(props.registeredId)}} className='bg-[#222831] h-fit py-2 px-3'>Unenroll</Button> : <Button onClick={() => {enroll(props.pitch?.id)}} className='bg-[#222831] h-fit py-2 px-3'>Join</Button>}
                 </div>
             </div>
         </div>

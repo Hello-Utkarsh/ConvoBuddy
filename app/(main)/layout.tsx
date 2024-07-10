@@ -1,15 +1,18 @@
 import React from 'react'
-import Sidebar from '../components/Sidebar';
+import Sidebar from '@/components/Sidebar';
+import RecoilContextProvider from '@/app/states/RecoilContextProvider'
 
 const layout = ({
-    children,
-  }: Readonly<{
-    children: React.ReactNode;
-  }>) => {
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => {
   return (
     <div className='flex'>
       <Sidebar />
-      {children}
+      <RecoilContextProvider>
+        {children}
+      </RecoilContextProvider>
     </div>
   )
 }

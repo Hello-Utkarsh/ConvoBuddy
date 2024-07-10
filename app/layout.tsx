@@ -8,7 +8,14 @@ import {
   SignedOut,
   UserButton
 } from '@clerk/nextjs'
-import Sidebar from "./components/Sidebar";
+import {
+  RecoilRoot,
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+} from 'recoil';
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +32,11 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${inter.className} bg-[#222831]`}>{children}</body>
+        <body className={`${inter.className} bg-[#222831]`}>
+          {/* <RecoilRoot> */}
+            {children}
+          {/* </RecoilRoot> */}
+        </body>
       </html>
     </ClerkProvider>
   );

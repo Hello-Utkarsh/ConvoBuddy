@@ -1,14 +1,10 @@
-'use client'
 import React, { useEffect } from 'react'
-import WordOfTheDay from '../../components/WordOfTheDay'
-import Pitches from '../../components/Pitches'
-import NoteCard from '../../components/NoteCard'
-import { Doughnut } from 'react-chartjs-2'
-import { ArcElement, Chart } from 'chart.js'
+import WordOfTheDay from '@/components/WordOfTheDay'
+import Pitches from '@/components/Pitches'
+import NoteCard from '@/components/NoteCard'
+import PieChart from '@/components/PieChart'
 
 const Page = () => {
-
-  Chart.register(ArcElement);
 
   const words = [
     {
@@ -28,23 +24,7 @@ const Page = () => {
             <p className='text-[#EEEEEE]'>See how you&#39;ve been spending your time practicing different languages.</p>
           </div>
           <div className='h-fit w-fit'>
-            <Doughnut className='h-32'
-            data={{
-              labels: [
-                'hello',
-                'Blue',
-                'Yellow',
-              ],
-              datasets: [{
-                label: 'My First Dataseteee',
-                data: [100],
-                backgroundColor: [
-                  'rgb(255 211 105)',
-                  'rgb(238, 238, 238)',
-                  'rgb(57, 62, 70)',
-                ],
-              }]
-            }} />
+            <PieChart/>
           </div>
         </div>
         <div className='w-full h-[50vh] py-2'>

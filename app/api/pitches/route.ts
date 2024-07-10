@@ -38,12 +38,16 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const body = await req.json();
+  const { userId }: any = auth();
+  if (body.createdId != userId) {
+    return NextResponse.json({message: "Invalid User"})
+  }
   const request = await prisma.pitch.delete({
     where: {
       id: body.id,
     },
   });
-  if (request) {
+  if (!request) {
     return NextResponse.json({message: "Please try again"})
   }
   return NextResponse.json({ message: "success" });
