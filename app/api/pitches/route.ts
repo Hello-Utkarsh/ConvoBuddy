@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  return NextResponse.json({ message: "success" });
+  return NextResponse.json({ message: "success", request });
 }
 
 export async function DELETE(req: NextRequest) {

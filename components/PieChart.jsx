@@ -2,13 +2,9 @@
 import React from 'react'
 import { ArcElement, Chart } from 'chart.js'
 import { Doughnut } from 'react-chartjs-2';
-import { textState } from '@/app/states/atoms/atoms';
-import { useRecoilValue } from 'recoil';
 
 const PieChart = () => {
-    const abc = useRecoilValue(textState)
 
-    console.log(abc)
     Chart.register(ArcElement);
 
     return (

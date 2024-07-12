@@ -1,14 +1,35 @@
 import React, { useEffect, useState } from 'react'
 import { MdOutlinePeopleAlt } from 'react-icons/md'
 import { Button } from "@/components/ui/button"
-import { useUser } from '@clerk/nextjs'
 import { enroll, unenroll } from '@/actions/useraction'
+import { useRecoilState } from 'recoil'
+import { pitch, registered_picth, user_pitch, } from '@/app/states/atoms/atoms'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert"
+
 
 const PitchCard = (props: any) => {
     const [date, setDate] = useState('')
-    const user: any = useUser()
+    const [error, setError] = useState('')
+    const [pitches, setPitches] = useRecoilState(pitch)
+    const [userpitch, setUserPitch] = useRecoilState(user_pitch)
+    const [registeredpitch, setRegisteredPitch] = useRecoilState(registered_picth)
 
-    const delPitch = async(id: number, createdId: string) => {
+    const delPitch = async (id: number, createdId: string) => {
         try {
             const req = await fetch('/api/pitches', {
                 method: 'DELETE',
@@ -18,8 +39,9 @@ const PitchCard = (props: any) => {
                 })
             })
             const res = await req.json()
-            if (res.message != 'success') {
-                return alert(res.message)
+            if (res.message == 'success') {
+                setPitches(pitches.filter((pitch: any) => pitch.id !== id))
+                setUserPitch(userpitch.filter((pitch: any) => pitch.id !== id))
             }
         } catch (error: any) {
             console.log(error.message)
@@ -58,10 +80,50 @@ const PitchCard = (props: any) => {
                     <MdOutlinePeopleAlt />
                 </span>
                 <div>
-                    {props.isUser ? <Button onClick={()=>{delPitch(props.pitch.id, props.pitch.createdId)}} className='bg-[#222831] h-fit py-2 px-3 mr-2'>Delete</Button> : null}
-                    {props.isRegistered ? <Button onClick={()=>{unenroll(props.registeredId)}} className='bg-[#222831] h-fit py-2 px-3'>Unenroll</Button> : <Button onClick={() => {enroll(props.pitch?.id)}} className='bg-[#222831] h-fit py-2 px-3'>Join</Button>}
+                    {props.isUser ?
+                        <AlertDialog>
+                            <AlertDialogTrigger className='bg-[#222831] h-fit text-sm py-2 px-3 mr-2 text-[#EEEEEE] rounded-md'>Delete</AlertDialogTrigger>
+                            <AlertDialogContent className='bg-[#222831] text-[#EEEEEE] border-0'>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete your pitch.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel className='text-[#222831]'>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => { delPitch(props.pitch.id, props.pitch.createdId) }}>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                        : null}
+                    {props.isRegistered ? <Button onClick={async () => {
+
+                        const res: any = await unenroll(props.registeredId)
+                        setRegisteredPitch(registeredpitch.filter((registered_pitch: any) => registered_pitch.id !== res.id))
+
+                    }} className='bg-[#222831] h-fit py-2 px-3 text-sm'>Unenroll</Button> : <Button onClick={async () => {
+
+                        const res: any = await enroll(props.pitch?.id)
+                        if (res.error) {
+                            return setError(res.error)
+                        }
+                        setRegisteredPitch((p): any => [...p, res])
+
+                    }} className='bg-[#222831] h-fit py-2 px-3 text-sm'>Join</Button>}
                 </div>
             </div>
+            {error &&
+                <Alert>
+                    <AlertTitle className='flex justify-between items-center'>
+                        <p>Oops!</p>
+                        <p className='text-base cursor-pointer' onClick={() => setError('')}>x</p>
+                    </AlertTitle>
+                    <AlertDescription>
+                        {error}
+                    </AlertDescription>
+                </Alert>
+            }
         </div>
     )
 }
