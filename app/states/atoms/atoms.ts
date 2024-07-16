@@ -22,6 +22,11 @@ export const registered_picth = atom({
   default: []
 })
 
+export const notes = atom({
+  key: 'notes',
+  default: []
+})
+
 // export function useSSR(atom: any) {
 //   const [isInitial, setIsInitial] = useState(true);
 //   const [value, setValue] = useRecoilState(atom);

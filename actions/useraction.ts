@@ -1,6 +1,3 @@
-import { registered_picth } from "@/app/states/atoms/atoms";
-import { useRecoilState, useSetRecoilState } from "recoil";
-
 export const enroll = async (pitchId: number) => {
   const req = await fetch("/api/pitches/registered", {
     method: "POST",
@@ -35,5 +32,27 @@ export const unenroll = async (id: number) => {
     }
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const addToNote = async (data: any) => {
+  try {
+    const req = await fetch("/api/notes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        word: data.word,
+        definition: data.definitions[0].text,
+        sentence: data.examples[0].text,
+        date: data.date,
+        partofspeech: data.definitions[0].partOfSpeech,
+      }),
+    });
+    const res = await req.json();
+    return res
+  } catch (error) {
+    return error
   }
 };
