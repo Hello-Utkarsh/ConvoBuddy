@@ -6,7 +6,7 @@ export default clerkMiddleware((auth, req) => {
         const { userId } = auth();
     
         if (!userId) {
-          return NextResponse.json({ error: "Unauthorized" });
+          return NextResponse.json({ message: "Please SignIn/Login" });
         }
 
         return NextResponse.next()

@@ -56,3 +56,22 @@ export const addToNote = async (data: any) => {
     return error
   }
 };
+
+export const delete_note = async(id: string) => {
+  try {
+    const req = await fetch('/api/notes', {
+      method: 'DELETE', 
+      headers: {
+        'Content-Type': 'applictaion/json'
+      },
+      body: JSON.stringify({
+        id: id
+      })
+    })
+    const res = await req.json()
+    return res
+  } catch (error) {
+    return error
+  }
+  
+}

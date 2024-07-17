@@ -46,3 +46,23 @@ export async function POST(req: NextRequest) {
     return error;
   }
 }
+
+export async function DELETE(req: NextRequest){
+  try {
+    const {userId}: any = auth()
+  const body: any = await req.json()
+  const delete_note = await prisma.notes.delete({
+    where: {
+      id: body.id,
+      createdBy: userId
+    }
+  })
+  if (!delete_note) {
+    return NextResponse.json({message: 'Not Found'}, {status: 400})
+  }
+  return NextResponse.json({message: 'success', delete_note})
+  } catch (error: any) {
+    return NextResponse.json({message: error.message}, {status: error.status})
+  }
+  
+}
