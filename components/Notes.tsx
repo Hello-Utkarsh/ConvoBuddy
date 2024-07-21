@@ -34,7 +34,7 @@ const Notes = () => {
     }, [])
 
     return (
-        <div className='w-full h-[50vh] py-2'>
+        <div className='w-full min-h-[57%] py-2'>
             <h1 className='text-[#FFD369] text-3xl font-medium my-2  w-fit mx-auto'>Notes</h1>
             <div className='w-full px-4 grid grid-cols-3'>
                 {word ? word.map((item: any) => {

@@ -1,26 +1,16 @@
-'use client'
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-  useUser
-} from '@clerk/nextjs'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { redirect} from 'next/navigation';
 
 
-export default function Home() {
-  const { isSignedIn } = useUser()
-  const router = useRouter()
+export default async function Home() {
+  const { userId } = auth()
 
-  useEffect(() => {
-    if (isSignedIn) {
-      router.push('/dashboard')
-    }
-  })
-  
+  if (userId) {
+    return redirect('/dashboard')
+  }
+
   return (
     <div className="px-7">
       <header className="flex justify-between items-center text-[#FFD369] h-[7vh]">

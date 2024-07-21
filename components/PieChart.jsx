@@ -8,7 +8,8 @@ const PieChart = () => {
     Chart.register(ArcElement);
 
     return (
-        <Doughnut className='h-32'
+        <Doughnut
+        style={{height: "110px"}}
             data={{
                 labels: [
                     'hello',

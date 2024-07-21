@@ -1,3 +1,5 @@
+import { revalidateTag } from "next/cache";
+
 export const enroll = async (pitchId: number) => {
   const req = await fetch("/api/pitches/registered", {
     method: "POST",
@@ -51,6 +53,7 @@ export const addToNote = async (data: any) => {
       }),
     });
     const res = await req.json();
+    revalidateTag('notes')
     return res
   } catch (error) {
     return error
@@ -72,6 +75,5 @@ export const delete_note = async(id: string) => {
     return res
   } catch (error) {
     return error
-  }
-  
+  } 
 }
