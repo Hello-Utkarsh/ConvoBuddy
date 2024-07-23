@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import React from 'react'
 import { MdOutlinePeopleAlt } from "react-icons/md";
-import { Button } from "./ui/button";
 
 
 const Pitches = () => {

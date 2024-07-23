@@ -1,6 +1,6 @@
 import React from 'react'
 
-const layout = () => {
+const DashLoad = () => {
   return (
     <div className='flex ml-[12%] animate-pulse justify-center'>
       <div className='flex-col'>
@@ -30,4 +30,4 @@ const layout = () => {
   )
 }
 
-export default layout
+export default DashLoad

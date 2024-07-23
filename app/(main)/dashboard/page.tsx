@@ -7,7 +7,7 @@ import Notes from '@/components/Notes'
 
 
 const Page = async() => {
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  
   return (
     <div className='flex ml-[12%]'>
       <div className='divide-y-4 divide-[#393E46] w-full h-[100vh] overflow-y-auto'>
