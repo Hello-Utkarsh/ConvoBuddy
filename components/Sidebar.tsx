@@ -18,6 +18,7 @@ const Sidebar = () => {
                 }} className='aria-pressed:bg-[#222831] hover:bg-[#222831] text-start pl-4 text-[#FFD369] py-2 rounded-sm my-2'>Profile</button>
                 <button aria-pressed = {checked == 'meet' ? 'true' : 'false'} onClick={() => {
                     setCheck("meet")
+                    router.push("/meet")
                 }} className='aria-pressed:bg-[#222831] hover:bg-[#222831] text-start pl-4 text-[#FFD369] py-2 rounded-sm my-2'>Meet</button>
                 <button aria-pressed = {checked == 'pitches' ? 'true' : 'false'} onClick={() => {
                     setCheck("pitches")

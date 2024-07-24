@@ -2,7 +2,7 @@
 import PitchCard from '@/components/PitchCard'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   DropdownMenu,
@@ -22,7 +22,7 @@ const LeaderBoard = () => {
   const [userpitch, setUserPitch] = useRecoilState(user_pitch)
   const [registeredpitch, setRegisteredPitch]: any = useRecoilState(registered_picth)
 
-  const get_all_pitches = async () => {
+  const get_all_pitches = useCallback(async () => {
     const req = await fetch('/api/pitches', {
       method: "GET"
     })
@@ -31,9 +31,9 @@ const LeaderBoard = () => {
     if (content.message == 'success') {
       setPitches(content.pitches)
     }
-  }
+  }, [])
 
-  const get_user_pitch = async () => {
+  const get_user_pitch = useCallback(async () => {
     const req = await fetch('/api/pitches/userpitch', {
       method: 'GET'
     })
@@ -42,21 +42,21 @@ const LeaderBoard = () => {
     if (content.message == 'success') {
       setUserPitch(content.user_pitch)
     }
-  }
+  }, [])
 
-  const get_registered_pitch = async () => {
+  const get_registered_pitch = useCallback(async () => {
     const req = await fetch('/api/pitches/registered', {
       method: 'GET'
     })
     const content = await req.json()
     setRegisteredPitch(content.registered_pitch)
-  }
+  }, [])
 
   useEffect(() => {
     get_all_pitches()
     get_user_pitch()
     get_registered_pitch()
-  }, [])
+  }, [get_all_pitches, get_user_pitch, get_registered_pitch])
 
   const {
     register,
