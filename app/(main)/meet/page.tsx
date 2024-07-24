@@ -50,10 +50,27 @@ const frameworks = [
     },
 ]
 
-const page = () => {
+const Meet = () => {
 
     const [open, setOpen] = useState(false)
     const [value, setValue]: any = useState([])
+    const [formData, setData]: any = useState({
+        name: "",
+        age: "",
+        interests: []
+    })
+
+    const handleChange = async (e: any) => {
+        const name = e.target.name
+        const value = e.target.value
+        setData((p: any) => ({ ...p, [name]: value }))
+    }
+
+
+    const handleSubmit = () => {
+        setData((p: any) => ({...p, 'interests': value}))
+        console.log(formData)
+    }
 
     return (
         <div className='flex flex-col ml-[12%] px-4 py-4 w-full'>
@@ -62,11 +79,11 @@ const page = () => {
                     <DialogTrigger className='bg-[#393E46] hover:bg-black px-2 rounded-md text-[#FFD369] tracking-tight w-fit mt-4'>Edit Prefrence</DialogTrigger>
                     <DialogContent className='bg-[#393E46]'>
                         <DialogHeader>
-                            <form className='flex flex-col' action="">
+                            <form className='flex flex-col' action={handleSubmit}>
                                 <label className='text-white mt-1 ml-1' htmlFor="">Name</label>
-                                <Input className='bg-[#222831] mt-1 text-white' type="text" placeholder="Joseph" />
+                                <Input name='name' onChange={handleChange} value={formData.name} className='bg-[#222831] mt-1 text-white' type="text" placeholder="Joseph" />
                                 <label className='text-white mt-2' htmlFor="">Age</label>
-                                <Input className='bg-[#222831] mt-1 text-white' type="number" placeholder="18" />
+                                <Input name='age' onChange={handleChange} className='bg-[#222831] mt-1 text-white' type="number" placeholder="18" />
                                 <Popover open={open} onOpenChange={setOpen}>
                                     <PopoverTrigger asChild>
                                         <Button
@@ -81,7 +98,7 @@ const page = () => {
                                     <PopoverContent className="w-[200px] p-0">
                                         <Command className='bg-[#222831] text-[#EEEEEE]'>
                                             <CommandInput placeholder="Search framework..." />
-                                            <CommandEmpty>No framework found.</CommandEmpty>
+                                            <CommandEmpty>Not found.</CommandEmpty>
                                             <CommandList>
                                                 <CommandGroup>
                                                     {frameworks.map((framework) => (
@@ -90,10 +107,9 @@ const page = () => {
                                                             key={framework.value}
                                                             value={framework.value}
                                                             onSelect={(currentValue) => {
-                                                                const exist = value.find((v: any) => currentValue == v)
-                                                                console.log(exist)
+                                                                const exist = formData['interests'].find((v: any) => currentValue == v)
                                                                 if (!exist) {
-                                                                    setValue((p: any) => [...p, currentValue])
+                                                                    setData((p: any) => ({...p, 'interests': [...formData['interests'], currentValue]}))
                                                                 }
                                                                 setOpen(false)
                                                             }}
@@ -113,8 +129,9 @@ const page = () => {
                                     </PopoverContent>
                                 </Popover>
                                 <div className='flex flex-wrap mt-1'>
-                                    {value && value.map((val: any) => { return <span className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mx-1'>{val} <span onClick={() => { setValue(value.filter((v: any) => v != val)) }} className='cursor-pointer'><IoIosClose /></span></span> })}
+                                    {formData['interests'] && formData['interests'].map((val: any) => { return <span className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mx-1'>{val} <span onClick={() => { setValue(value.filter((v: any) => v != val)) }} className='cursor-pointer'><IoIosClose /></span></span> })}
                                 </div>
+                                <Button type='submit' className='bg-[#222831] text-[#EEEEEE] tracking-tight w-fit mt-2'>Submit</Button>
                             </form>
                         </DialogHeader>
                     </DialogContent>
@@ -125,4 +142,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Meet

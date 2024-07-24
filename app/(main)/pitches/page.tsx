@@ -16,7 +16,7 @@ import { RecoilRoot, useRecoilState, useRecoilValue } from 'recoil'
 import { pitch, registered_picth, user_pitch } from '@/app/states/atoms/atoms'
 
 
-const LeaderBoard = () => {
+const Pitches = () => {
   const [pitches, setPitches] = useRecoilState(pitch)
   const [createDialog, setDialog] = useState(false)
   const [userpitch, setUserPitch] = useRecoilState(user_pitch)
@@ -170,4 +170,4 @@ const LeaderBoard = () => {
   )
 }
 
-export default LeaderBoard
+export default Pitches
