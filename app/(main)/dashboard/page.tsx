@@ -4,9 +4,17 @@ import WordOfTheDay from '@/components/WordOfTheDay'
 import Pitches from '@/components/Pitches'
 import PieChart from '@/components/PieChart'
 import Notes from '@/components/Notes'
+import { redirect } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 
 
 const Page = async() => {
+
+  const { userId } = auth()
+  if (!userId) {
+    redirect('/')
+  }
   
   return (
     <div className='flex ml-[12%]'>

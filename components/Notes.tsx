@@ -19,7 +19,7 @@ const Notes = () => {
     const {toast} = useToast()
     const [word, setWord]: any = useRecoilState(notes)
 
-    const get_notes = useCallback(async () => {
+    const get_notes = async () => {
         const req = await fetch('/api/notes', {
             method: 'GET'
         })
@@ -27,11 +27,11 @@ const Notes = () => {
         if (notes.message = 'success') {
             setWord(notes.req)
         }
-    }, [])
+    }
 
     useEffect(() => {
         get_notes()
-    }, [get_notes])
+    }, [])
 
     return (
         <div className='w-full min-h-[57%] py-2'>

@@ -5,8 +5,11 @@ import AddToNote from './AddToNote'
 const get_word_of_the_day = async () => {
     const date = new Date()
     const wordofthedaykey = process.env.NEXT_PUBLIC_WORD_OF_THE_DAY_KEY
+    const day = date.getDate() > 10 ? (date.getDate()-1).toString() : "0" + (date.getDate()-1)
+    const month = date.getMonth() + 1 > 10 ? (date.getMonth()+1).toString() : "0" + (date.getMonth()+1)
+    const year = date.getFullYear().toString()
     try {
-        const req = await fetch(`https://api.wordnik.com/v4/words.json/wordOfTheDay?date=${date.getDate()}%2F0${date.getMonth() + 1}%2F${date.getFullYear()}&api_key=${wordofthedaykey}`, {
+        const req = await fetch(`https://api.wordnik.com/v4/words.json/wordOfTheDay?date=${year}-${month}-${day}&api_key=${wordofthedaykey}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
@@ -15,7 +18,6 @@ const get_word_of_the_day = async () => {
         })
         let res = await req.json()
         res['date'] = date.toLocaleDateString()
-        console.log(res)
         return res
     } catch (error: any) {
         console.log(error)

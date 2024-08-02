@@ -21,8 +21,10 @@ const Pitches = () => {
   const [createDialog, setDialog] = useState(false)
   const [userpitch, setUserPitch] = useRecoilState(user_pitch)
   const [registeredpitch, setRegisteredPitch]: any = useRecoilState(registered_picth)
+  const { isSignedIn } = useUser()
+  const router = useRouter()
 
-  const get_all_pitches = useCallback(async () => {
+  const get_all_pitches = async () => {
     const req = await fetch('/api/pitches', {
       method: "GET"
     })
@@ -31,9 +33,9 @@ const Pitches = () => {
     if (content.message == 'success') {
       setPitches(content.pitches)
     }
-  }, [])
+  }
 
-  const get_user_pitch = useCallback(async () => {
+  const get_user_pitch = async () => {
     const req = await fetch('/api/pitches/userpitch', {
       method: 'GET'
     })
@@ -42,21 +44,24 @@ const Pitches = () => {
     if (content.message == 'success') {
       setUserPitch(content.user_pitch)
     }
-  }, [])
+  }
 
-  const get_registered_pitch = useCallback(async () => {
+  const get_registered_pitch = async () => {
     const req = await fetch('/api/pitches/registered', {
       method: 'GET'
     })
     const content = await req.json()
     setRegisteredPitch(content.registered_pitch)
-  }, [])
+  }
 
   useEffect(() => {
+    if (!isSignedIn) {
+      router.push('/')
+    }
     get_all_pitches()
     get_user_pitch()
     get_registered_pitch()
-  }, [get_all_pitches, get_user_pitch, get_registered_pitch])
+  }, [])
 
   const {
     register,

@@ -82,7 +82,7 @@ const PitchCard = (props: any) => {
                 <div>
                     {props.isUser ?
                         <AlertDialog>
-                            <AlertDialogTrigger className='bg-[#222831] h-fit text-sm py-2 px-3 mr-2 text-[#EEEEEE] rounded-md'>Delete</AlertDialogTrigger>
+                            <AlertDialogTrigger><Button className='bg-[#222831] h-fit text-sm py-2 px-3 mr-2'>Delete</Button></AlertDialogTrigger>
                             <AlertDialogContent className='bg-[#222831] text-[#EEEEEE] border-0'>
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
