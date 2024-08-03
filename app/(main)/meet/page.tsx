@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { IoIosClose } from "react-icons/io";
 import {
@@ -77,6 +77,28 @@ const Meet = () => {
     const [languageOpen, setLanguageOpen] = useState(false)
     const [interestValue, setInterest]: any = useState([])
     const [languageValue, setLanguage]: any = useState([])
+    const [video, setVideo]: any = useState(false)
+    const vidcomp = useRef(null)
+    const constraints = {
+        video: true,
+        audio: true
+    };
+
+    function handleSuccess(stream: any) {
+        const videoElement: any = vidcomp.current
+        videoElement.srcObject = stream;
+        videoElement.srcObject.getTracks().forEach((track: any) => {
+            if (track.readyState == "live") {
+                setVideo(true)
+            }
+        })
+    }
+
+    function handleError(error: any) {
+        console.error('Error accessing media devices.', error);
+    }
+
+
 
     const [formData, setData]: any = useState({
         name: "",
@@ -101,7 +123,7 @@ const Meet = () => {
     }
 
     return (
-        <div className='flex flex-col ml-[12%] px-4 py-4 w-full'>
+        <div className='flex flex-col ml-[12%] px-16 py-4 w-full'>
             <div className='flex justify-between w-full'>
                 <Dialog>
                     <DialogTrigger className='bg-[#393E46] hover:bg-black px-2 rounded-md text-[#FFD369] tracking-tight w-fit mt-4'>Edit Prefrence</DialogTrigger>
@@ -159,7 +181,13 @@ const Meet = () => {
                                             </PopoverContent>
                                         </Popover>
                                         <div className='flex flex-wrap mt-1'>
-                                            {formData['interests'] && formData['interests'].map((val: any) => { return <span className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mt-1 mx-1'>{val} <span onClick={() => { setData((p: any) => ({ ...p, 'interests': formData['interests'].filter((v: any) => v != val) })) }} className='cursor-pointer'><IoIosClose /></span></span> })}
+                                            {formData['interests'] && formData['interests'].map((val: any) => {
+                                                return <span key={val} className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mt-1 mx-1'>
+                                                    <p className='-mt-1'>{val}</p> <span onClick={() => {
+                                                        setData((p: any) => ({ ...p, 'interests': formData['interests'].filter((v: any) => v != val) }))
+                                                    }} className='cursor-pointer'><IoIosClose /></span>
+                                                </span>
+                                            })}
                                         </div>
                                     </div>
                                     <div>
@@ -210,7 +238,7 @@ const Meet = () => {
                                             </PopoverContent>
                                         </Popover>
                                         <div className='flex flex-wrap mt-1'>
-                                            {formData['language'] && formData['language'].map((val: any) => { return <span className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mt-1 mx-1'>{val} <span onClick={() => { setData((p: any) => ({ ...p, 'language': formData['language'].filter((v: any) => v != val) })) }} className='cursor-pointer'><IoIosClose /></span></span> })}
+                                            {formData['language'] && formData['language'].map((val: any) => { return <span key={val} className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mx-1'><p className='-mt-1'>{val}</p> <span onClick={() => { setData((p: any) => ({ ...p, 'language': formData['language'].filter((v: any) => v != val) })) }} className='cursor-pointer'><IoIosClose /></span></span> })}
                                         </div>
                                     </div>
                                 </div>
@@ -219,7 +247,32 @@ const Meet = () => {
                         </DialogHeader>
                     </DialogContent>
                 </Dialog>
-                <Button className='bg-[#393E46] text-[#FFD369] tracking-tight w-fit mt-4'>Button</Button>
+                {!video ? <Button onClick={() => {
+                    navigator.mediaDevices.getUserMedia(constraints)
+                        .then(handleSuccess)
+                        .catch(handleError)
+                }} className='bg-[#393E46] text-[#FFD369] mt-4'>Start</Button> :
+                    <div className='flex'>
+                        <Button onClick={() => {
+                            const videoElement: any = vidcomp.current
+                            const stream = videoElement.srcObject;
+                            const tracks = stream.getTracks();
+                            tracks.forEach((track: any) => {
+                                track.stop();
+                                setVideo(false)
+                            });
+                        }} className='bg-[#393E46] text-[#FFD369] mt-4 mx-2'>End</Button>
+                        <Button className='bg-[#393E46] text-[#FFD369] mt-4 mx-2'>Next</Button>
+                    </div>
+                }
+            </div>
+            <div>
+                <div className='mt-8 relative w-10/12 mx-auto'>
+                    <div className='bg-gray-400 h-[80vh] flex justify-center items-center'>Recevers Video</div>
+                    <div className='bg-gray-100 h-fit absolute right-8 bottom-2 justify-center items-center flex'>
+                        <video className='h-[25vh] aspect-auto' ref={vidcomp} id="localVideo" autoPlay />
+                    </div>
+                </div>
             </div>
         </div>
     )
