@@ -13,9 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Prefrence{
+  userid String @id
+  name String?
+  age Int?
+  interests String[]
+  languages String[]
+}
+
 model User {
-  id Int @id @default(autoincrement())
-  userid String
+  userid String @id
   registeredId Int
   registered Pitch @relation(fields: [registeredId], references: [id])
 }

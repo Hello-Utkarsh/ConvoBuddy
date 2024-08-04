@@ -16,7 +16,6 @@ export default function AddToNote(props: any) {
         <div className='flex justify-center'>
             <Button onClick={async () => {
                 const res: any = await addToNote(word)
-                console.log(res)
                 if (res.message == "success") {
                     setNote((p): any => [...p, res.note])
                     toast({

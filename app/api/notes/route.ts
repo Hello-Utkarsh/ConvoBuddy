@@ -41,9 +41,10 @@ export async function POST(req: NextRequest) {
         createdBy: userId,
       },
     });
+    console.log(note)
     return NextResponse.json({ message: "success", note });
-  } catch (error) {
-    return error;
+  } catch (error: any) {
+    return NextResponse.json({message: error.message}, {status: error.status});
   }
 }
 

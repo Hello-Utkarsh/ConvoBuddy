@@ -99,7 +99,7 @@ const PitchCard = (props: any) => {
                         : null}
                     {props.isRegistered ? <Button onClick={async () => {
 
-                        const res: any = await unenroll(props.registeredId)
+                        const res: any = await unenroll()
                         setRegisteredPitch(registeredpitch.filter((registered_pitch: any) => registered_pitch.id !== res.id))
 
                     }} className='bg-[#222831] h-fit py-2 px-3 text-sm'>Unenroll</Button> : <Button onClick={async () => {

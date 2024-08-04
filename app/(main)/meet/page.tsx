@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { IoIosClose } from "react-icons/io";
 import {
@@ -28,6 +28,8 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/components/ui/use-toast';
 
 const frameworks = [
     {
@@ -69,16 +71,19 @@ const Meet = () => {
 
     const { isSignedIn } = useUser()
     const router = useRouter()
-    if (!isSignedIn) {
-        router.push('/')
-    }
-
     const [interestOpen, setInterestOpen] = useState(false)
     const [languageOpen, setLanguageOpen] = useState(false)
     const [interestValue, setInterest]: any = useState([])
     const [languageValue, setLanguage]: any = useState([])
     const [video, setVideo]: any = useState(false)
     const vidcomp = useRef(null)
+    const { toast } = useToast()
+    const [formData, setData]: any = useState({
+        name: "",
+        age: "",
+        interests: [],
+        language: []
+    })
     const constraints = {
         video: true,
         audio: true
@@ -98,14 +103,13 @@ const Meet = () => {
         console.error('Error accessing media devices.', error);
     }
 
-
-
-    const [formData, setData]: any = useState({
-        name: "",
-        age: "",
-        interests: [],
-        language: []
+    useEffect(() => {
+        if (!isSignedIn) {
+            router.push('/')
+        }
     })
+
+
 
     const handleChange = async (e: any) => {
         const name = e.target.name
@@ -114,8 +118,27 @@ const Meet = () => {
     }
 
 
-    const handleSubmit = () => {
-        setData((p: any) => ({ ...p, 'interests': interestValue }))
+    const handleSubmit = async () => {
+
+        const savePref = await fetch('/api/prefrence', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: formData.name,
+                age: formData.age,
+                interests: formData.interests,
+                languages: formData.language
+            })
+        })
+        const res = await savePref.json()
+        console.log(res)
+        if (res.message == 'success') {
+            toast({
+                description: "Added Successfully"
+            })
+        }
     }
 
     const addLang = (e: any) => {
@@ -274,6 +297,7 @@ const Meet = () => {
                     </div>
                 </div>
             </div>
+            <Toaster />
         </div>
     )
 }

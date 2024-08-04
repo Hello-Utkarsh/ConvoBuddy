@@ -1,5 +1,3 @@
-import { revalidateTag } from "next/cache";
-
 export const enroll = async (pitchId: number) => {
   const req = await fetch("/api/pitches/registered", {
     method: "POST",
@@ -17,16 +15,13 @@ export const enroll = async (pitchId: number) => {
   return res;
 };
 
-export const unenroll = async (id: number) => {
+export const unenroll = async () => {
   try {
     const req = await fetch("/api/pitches/registered", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id,
-      }),
+      }
     });
     const res = await req.json();
     if (res.message == "success") {
@@ -53,7 +48,6 @@ export const addToNote = async (data: any) => {
       }),
     });
     const res = await req.json();
-    revalidateTag('notes')
     return res
   } catch (error) {
     return error

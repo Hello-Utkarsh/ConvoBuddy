@@ -36,7 +36,7 @@ const Notes = () => {
     return (
         <div className='w-full min-h-[57%] py-2'>
             <h1 className='text-[#FFD369] text-3xl font-medium my-2  w-fit mx-auto'>Notes</h1>
-            <div className='w-full px-4 grid grid-cols-3'>
+            <div className='w-full px-4 grid grid-cols-3 gap-4'>
                 {word ? word.map((item: any) => {
                     return <Card className='bg-[#393E46] text-[#EEEEEE] border-none' key={item.id}>
                         <CardHeader className='px-5 pb-3 flex flex-row justify-between'>

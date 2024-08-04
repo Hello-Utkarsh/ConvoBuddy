@@ -51,12 +51,13 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ message: "success", registered_pitch });
 }
 
-export async function DELETE(req: NextRequest){
-  const body = await req.json()
+export async function DELETE(){
   const { userId }: any = auth();
+  if (!userId) {
+    return NextResponse.json({message: "Unauthorized"}, {status: 400})
+  }
   const delete_pitch = await prisma.user.delete({
     where: {
-      id: body.id,
       userid: userId
     }
   })
