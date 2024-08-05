@@ -25,7 +25,7 @@ const Sidebar = () => {
                     router.push('/pitches')}} className='aria-pressed:bg-[#222831] hover:bg-[#222831] text-start pl-4 text-[#FFD369] py-2 rounded-sm my-2'>Pitches</button>
                 <button aria-pressed = {checked == 'leaderboard' ? 'true' : 'false'} onClick={() => {
                     setCheck("leaderboard")
-                    router.push('/leaderboard')}} className='aria-pressed:bg-[#222831] hover:bg-[#222831] text-start pl-4 text-[#FFD369] py-2 rounded-sm my-2'>Leaderboard</button>
+                    router.push('/feedback')}} className='aria-pressed:bg-[#222831] hover:bg-[#222831] text-start pl-4 text-[#FFD369] py-2 rounded-sm my-2'>Feedback</button>
                 <button aria-pressed = {checked == 'logout' ? 'true' : 'false'} onClick={() => signOut({redirectUrl: '/'}) } className='aria-pressed:bg-[#222831] hover:bg-[#222831] text-start pl-4 text-[#FFD369] py-2 rounded-sm my-2'>Logout</button>
             </div>
         </div>

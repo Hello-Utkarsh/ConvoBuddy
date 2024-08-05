@@ -73,8 +73,6 @@ const Meet = () => {
     const router = useRouter()
     const [interestOpen, setInterestOpen] = useState(false)
     const [languageOpen, setLanguageOpen] = useState(false)
-    const [interestValue, setInterest]: any = useState([])
-    const [languageValue, setLanguage]: any = useState([])
     const [video, setVideo]: any = useState(false)
     const vidcomp = useRef(null)
     const { toast } = useToast()
@@ -82,7 +80,7 @@ const Meet = () => {
         name: "",
         age: "",
         interests: [],
-        language: []
+        languages: []
     })
     const constraints = {
         video: true,
@@ -107,7 +105,8 @@ const Meet = () => {
         if (!isSignedIn) {
             router.push('/')
         }
-    })
+        getPref()
+    }, [])
 
 
 
@@ -119,7 +118,6 @@ const Meet = () => {
 
 
     const handleSubmit = async () => {
-
         const savePref = await fetch('/api/prefrence', {
             method: 'POST',
             headers: {
@@ -129,15 +127,27 @@ const Meet = () => {
                 name: formData.name,
                 age: formData.age,
                 interests: formData.interests,
-                languages: formData.language
+                languages: formData.languages
             })
         })
         const res = await savePref.json()
-        console.log(res)
         if (res.message == 'success') {
             toast({
                 description: "Added Successfully"
             })
+        }
+    }
+
+    const getPref = async () => {
+        const req = await fetch('/api/prefrence', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'applictaion/json'
+            }
+        })
+        const pref = await req.json()
+        if (pref.message == 'success') {
+            setData(pref.pref)
         }
     }
 
@@ -156,7 +166,7 @@ const Meet = () => {
                                 <label className='text-white mt-1 ml-1' htmlFor="">Name</label>
                                 <Input name='name' onChange={handleChange} value={formData.name} className='bg-[#222831] mt-1 text-white' type="text" placeholder="Joseph" />
                                 <label className='text-white mt-2' htmlFor="">Age</label>
-                                <Input name='age' onChange={handleChange} className='bg-[#222831] mt-1 text-white' type="number" placeholder="18" />
+                                <Input value={formData.age} name='age' onChange={handleChange} className='bg-[#222831] mt-1 text-white' type="number" placeholder="18" />
                                 <div className='flex justify-between'>
                                     <div>
                                         <Popover open={interestOpen} onOpenChange={setInterestOpen}>
@@ -178,7 +188,7 @@ const Meet = () => {
                                                         <CommandGroup>
                                                             {frameworks.map((framework) => (
                                                                 <CommandItem
-                                                                    className='text-[#EEEEEE]'
+                                                                    className='text-[#EEEEEE] pl-6'
                                                                     key={framework.id}
                                                                     value={framework.value}
                                                                     onSelect={(currentValue) => {
@@ -189,12 +199,6 @@ const Meet = () => {
                                                                         setInterestOpen(false)
                                                                     }}
                                                                 >
-                                                                    <Check
-                                                                        className={cn(
-                                                                            "mr-2 h-4 w-4",
-                                                                            interestValue === framework.value ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
                                                                     {framework.label}
                                                                 </CommandItem>
                                                             ))}
@@ -235,23 +239,17 @@ const Meet = () => {
                                                         <CommandGroup>
                                                             {Languages.map((Language) => (
                                                                 <CommandItem
-                                                                    className='text-[#EEEEEE]'
+                                                                    className='text-[#EEEEEE] pl-6'
                                                                     key={Language.id}
                                                                     value={Language.value}
                                                                     onSelect={(currentValue) => {
-                                                                        const exist = formData['language'].find((v: any) => currentValue == v)
+                                                                        const exist = formData['languages'].find((v: any) => currentValue == v)
                                                                         if (!exist) {
-                                                                            setData((p: any) => ({ ...p, 'language': [...formData['language'], currentValue] }))
+                                                                            setData((p: any) => ({ ...p, 'language': [...formData['languages'], currentValue] }))
                                                                         }
                                                                         setLanguageOpen(false)
                                                                     }}
                                                                 >
-                                                                    <Check
-                                                                        className={cn(
-                                                                            "mr-2 h-4 w-4",
-                                                                            languageValue === Language.value ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
                                                                     {Language.label}
                                                                 </CommandItem>
                                                             ))}
@@ -261,7 +259,7 @@ const Meet = () => {
                                             </PopoverContent>
                                         </Popover>
                                         <div className='flex flex-wrap mt-1'>
-                                            {formData['language'] && formData['language'].map((val: any) => { return <span key={val} className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mx-1'><p className='-mt-1'>{val}</p> <span onClick={() => { setData((p: any) => ({ ...p, 'language': formData['language'].filter((v: any) => v != val) })) }} className='cursor-pointer'><IoIosClose /></span></span> })}
+                                            {formData['languages'] && formData['languages'].map((val: any) => { return <span key={val} className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mx-1'><p className='-mt-1'>{val}</p> <span onClick={() => { setData((p: any) => ({ ...p, 'language': formData['languages'].filter((v: any) => v != val) })) }} className='cursor-pointer'><IoIosClose /></span></span> })}
                                         </div>
                                     </div>
                                 </div>

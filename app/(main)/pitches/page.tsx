@@ -88,7 +88,6 @@ const Pitches = () => {
       const response = await req.json()
       console.log(response)
       if (response.message == 'success') {
-        console.log(response.request)
         setUserPitch((p): any => [...p, response.request])
         setPitches((p): any => [...p, response.request])
       }
@@ -145,8 +144,8 @@ const Pitches = () => {
               </span>
             </div>
             <div className='flex justify-between w-full'>
-              <input onClick={() => setDialog(false)} type="submit" className='mt-4 bg-[#222831] px-3 py-1 rounded-md text-[#eeeeee] w-fit text-lg' />
-              <button onClick={() => setDialog(false)} className='mt-4 bg-[#222831] px-3 py-1 rounded-md text-[#eeeeee] w-fit text-lg'>close</button>
+              <input onClick={() => setDialog(false)} type="submit" className='mt-4 hover:cursor-pointer bg-[#222831] px-3 py-1 rounded-md text-[#eeeeee] w-fit text-lg' />
+              <button onClick={() => setDialog(false)} className='mt-4 bg-[#222831] hover:cursor-pointer px-3 py-1 rounded-md text-[#eeeeee] w-fit text-lg'>close</button>
             </div>
           </form>
 
