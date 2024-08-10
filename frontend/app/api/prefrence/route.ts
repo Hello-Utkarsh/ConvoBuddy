@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         name: body.name,
         age: parseInt(body.age),
         interests: body.interests,
-        languages: body.language,
+        languages: body.languages,
       },
       create: {
         userid: userId,

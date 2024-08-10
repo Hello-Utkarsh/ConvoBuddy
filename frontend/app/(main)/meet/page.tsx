@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { IoIosClose } from "react-icons/io";
+import { v4 as uuidv4 } from 'uuid';
 import {
     Dialog,
     DialogContent,
@@ -74,7 +75,14 @@ const Meet = () => {
     const [interestOpen, setInterestOpen] = useState(false)
     const [languageOpen, setLanguageOpen] = useState(false)
     const [video, setVideo]: any = useState(false)
-    const vidcomp = useRef(null)
+    const [sendingPc, setSendingPc] = useState()
+    const [recevingPc, setRecevingPc] = useState()
+    const [remateVideoTrack, setRemoteVideoTrack] = useState()
+    const [remoteMediaStream, setRemoteMediaStream] = useState()
+    const [remoteAuidoTrack, setRemoteAuidoTrack] = useState()
+    const remoteVideoRef = useRef(null)
+    let localVideoRef = useRef(null)
+    const videoElement: any = remoteVideoRef.current
     const { toast } = useToast()
     const [formData, setData]: any = useState({
         name: "",
@@ -82,19 +90,114 @@ const Meet = () => {
         interests: [],
         languages: []
     })
-    const constraints = {
-        video: true,
-        audio: true
-    };
 
     function handleSuccess(stream: any) {
-        const videoElement: any = vidcomp.current
+        formData.userid = uuidv4()
         videoElement.srcObject = stream;
-        videoElement.srcObject.getTracks().forEach((track: any) => {
-            if (track.readyState == "live") {
-                setVideo(true)
+        const ws = new WebSocket('ws://localhost:8080')
+        ws.onopen = () => {
+            ws.send(JSON.stringify({ type: 'add-user', formData }))
+            ws.onmessage = async (event: any) => {
+                const message = JSON.parse(event.data)
+                if (message.type == 'send-offer') {
+                    const pc = new RTCPeerConnection()
+                    setSendingPc(pc)
+                    pc.addTrack(videoElement.srcObject.getAudioTracks()[0])
+                    pc.addTrack(videoElement.srcObject.getVideoTracks()[0])
+
+                    pc.onicecandidate = async (can: any) => {
+                        if (can.candidate) {
+                            ws.send(JSON.stringify({
+                                type: 'add-ice-candidate',
+                                candidate: can.candidate,
+                                userType: 'sender'
+                            }))
+                            pc.addIceCandidate(can.candidate)
+                        }
+                    }
+
+                    pc.onnegotiationneeded = async () => {
+                        const sdp = await pc.createOffer()
+                        pc.setLocalDescription(sdp)
+                        ws.send(JSON.stringify({ type: 'offer', sdp: sdp, roomId: message.roomId }))
+                    }
+                    console.log("object")
+                }
+
+                if (message.type == 'offer') {
+                    const pc: RTCPeerConnection = new RTCPeerConnection()
+                    pc.setRemoteDescription(message.sdp)
+                    const sdp = await pc.createAnswer()
+                    console.log(sdp, "answer sdp")
+                    pc.setLocalDescription(sdp)
+                    const stream: any = new MediaStream()
+                    if (videoElement) {
+                        videoElement.srcObject = stream
+
+                    }
+
+                    setRemoteMediaStream(stream)
+                    setRecevingPc(pc)
+                    pc.onicecandidate = async (can: any) => {
+                        if (can.candidate) {
+                            console.log("inside offer inside onicecandidate", can.candidate)
+                            ws.send(JSON.stringify({
+                                type: 'add-ice-candidate',
+                                roomId: message.roomId,
+                                id: message.id,
+                                candidate: can.candidate,
+                                userType: 'receiver'
+                            }))
+                            pc.addIceCandidate(can.candidate)
+                        }
+                    }
+                    
+                    pc.ontrack = (({ track, type }: any) => {
+                        if (type == 'auido') {
+                            //@ts-ignore
+                            videoElement.srcObject.addTrack(track)
+                        } else {
+                            videoElement.srcObject.addTrack(track)
+                        }
+                        //@ts-ignore
+                        remoteVideoRef.current.play()
+                    })
+                    console.log(sdp)
+                    ws.send(JSON.stringify({ type: 'answer', roomId: message.roomId, sdp: sdp, id: message.id }))
+                    console.log('successfully sent answer req')
+                }
+
+                if (message.type == 'answer') {
+                    console.log(message.sdp, "inside answer sdp")
+                    setSendingPc((pc: RTCPeerConnection) => {
+                        pc.setRemoteDescription(message.sdp)
+                        return pc
+                    })
+                }
+
+                if (message.type == 'add-ice-candidate') {
+                    console.log("inside add-ice-candidate")
+                    if (message.userType == 'sender') {
+                        console.log("add-ice-candidate")
+                        console.log(message.candidate, "message candidate")
+                        setRecevingPc(pc => {
+                            pc?.addIceCandidate(message.candidate)
+                            return pc
+                        })
+                        console.log("crossed it!")
+                    } else {
+                        console.log("add-ice-candidate2")
+                        setRecevingPc(pc => {
+                            pc?.addIceCandidate(message.candidate)
+                            return pc
+                        })
+                        console.log("crossed it2!")
+                    }
+                }
             }
-        })
+        }
+
+
     }
 
     function handleError(error: any) {
@@ -106,6 +209,9 @@ const Meet = () => {
             router.push('/')
         }
         getPref()
+        // if (localVideoRef.current) {
+        //     localVideoRef.current.srcObject = new MediaStream([local])
+        // }
     }, [])
 
 
@@ -118,6 +224,7 @@ const Meet = () => {
 
 
     const handleSubmit = async () => {
+        console.log(formData)
         const savePref = await fetch('/api/prefrence', {
             method: 'POST',
             headers: {
@@ -148,6 +255,7 @@ const Meet = () => {
         const pref = await req.json()
         if (pref.message == 'success') {
             setData(pref.pref)
+            return pref.pref
         }
     }
 
@@ -245,7 +353,7 @@ const Meet = () => {
                                                                     onSelect={(currentValue) => {
                                                                         const exist = formData['languages'].find((v: any) => currentValue == v)
                                                                         if (!exist) {
-                                                                            setData((p: any) => ({ ...p, 'language': [...formData['languages'], currentValue] }))
+                                                                            setData((p: any) => ({ ...p, 'languages': [...formData['languages'], currentValue] }))
                                                                         }
                                                                         setLanguageOpen(false)
                                                                     }}
@@ -259,7 +367,7 @@ const Meet = () => {
                                             </PopoverContent>
                                         </Popover>
                                         <div className='flex flex-wrap mt-1'>
-                                            {formData['languages'] && formData['languages'].map((val: any) => { return <span key={val} className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mx-1'><p className='-mt-1'>{val}</p> <span onClick={() => { setData((p: any) => ({ ...p, 'language': formData['languages'].filter((v: any) => v != val) })) }} className='cursor-pointer'><IoIosClose /></span></span> })}
+                                            {formData['languages'] && formData['languages'].map((val: any) => { return <span key={val} className='px-2 flex items-center py-1 bg-[#222831] text-[#EEEEEE] rounded-md mx-1'><p className='-mt-1'>{val}</p> <span onClick={() => { setData((p: any) => ({ ...p, 'languages': formData['languages'].filter((v: any) => v != val) })) }} className='cursor-pointer'><IoIosClose /></span></span> })}
                                         </div>
                                     </div>
                                 </div>
@@ -269,7 +377,10 @@ const Meet = () => {
                     </DialogContent>
                 </Dialog>
                 {!video ? <Button onClick={() => {
-                    navigator.mediaDevices.getUserMedia(constraints)
+                    window.navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true
+                    })
                         .then(handleSuccess)
                         .catch(handleError)
                 }} className='bg-[#393E46] text-[#FFD369] mt-4'>Start</Button> :
@@ -291,7 +402,7 @@ const Meet = () => {
                 <div className='mt-8 relative w-10/12 mx-auto'>
                     <div className='bg-gray-400 h-[80vh] flex justify-center items-center'>Recevers Video</div>
                     <div className='bg-gray-100 h-fit absolute right-8 bottom-2 justify-center items-center flex'>
-                        <video className='h-[25vh] aspect-auto' ref={vidcomp} id="localVideo" autoPlay />
+                        <video className='h-[25vh] aspect-auto' ref={remoteVideoRef} id="localVideo" autoPlay />
                     </div>
                 </div>
             </div>
