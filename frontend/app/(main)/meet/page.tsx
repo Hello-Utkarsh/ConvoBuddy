@@ -75,14 +75,14 @@ const Meet = () => {
     const [interestOpen, setInterestOpen] = useState(false)
     const [languageOpen, setLanguageOpen] = useState(false)
     const [video, setVideo]: any = useState(false)
-    const [sendingPc, setSendingPc] = useState()
+    const [sendingPc, setSendingPc]: any = useState()
     const [recevingPc, setRecevingPc] = useState()
     const [remateVideoTrack, setRemoteVideoTrack] = useState()
     const [remoteMediaStream, setRemoteMediaStream] = useState()
     const [remoteAuidoTrack, setRemoteAuidoTrack] = useState()
     const remoteVideoRef = useRef(null)
     let localVideoRef = useRef(null)
-    const videoElement: any = remoteVideoRef.current
+    const videoElement: any = localVideoRef.current
     const { toast } = useToast()
     const [formData, setData]: any = useState({
         name: "",
@@ -93,6 +93,7 @@ const Meet = () => {
 
     function handleSuccess(stream: any) {
         formData.userid = uuidv4()
+        console.log(formData.userid, "your id")
         videoElement.srcObject = stream;
         const ws = new WebSocket('ws://localhost:8080')
         ws.onopen = () => {
@@ -102,45 +103,50 @@ const Meet = () => {
                 if (message.type == 'send-offer') {
                     const pc = new RTCPeerConnection()
                     setSendingPc(pc)
-                    pc.addTrack(videoElement.srcObject.getAudioTracks()[0])
-                    pc.addTrack(videoElement.srcObject.getVideoTracks()[0])
+                    if (videoElement.srcObject.getAudioTracks()[0]) {
+                        pc.addTrack(videoElement.srcObject.getAudioTracks()[0])
+                    }
+                    if (videoElement.srcObject.getVideoTracks()[0]) {
+                        pc.addTrack(videoElement.srcObject.getVideoTracks()[0])
+                    }
 
+                    console.log(message.id, "id sent to the ice candidate from send-offer")
                     pc.onicecandidate = async (can: any) => {
                         if (can.candidate) {
                             ws.send(JSON.stringify({
                                 type: 'add-ice-candidate',
+                                roomId: message.roomId,
+                                id: message.id,
                                 candidate: can.candidate,
                                 userType: 'sender'
                             }))
-                            pc.addIceCandidate(can.candidate)
                         }
                     }
 
                     pc.onnegotiationneeded = async () => {
-                        const sdp = await pc.createOffer()
+                        const sdp = await pc.createOffer();
                         pc.setLocalDescription(sdp)
-                        ws.send(JSON.stringify({ type: 'offer', sdp: sdp, roomId: message.roomId }))
+                        ws.send(JSON.stringify({ type: 'offer', sdp: sdp, id: message.id, roomId: message.roomId }))
                     }
-                    console.log("object")
                 }
 
                 if (message.type == 'offer') {
-                    const pc: RTCPeerConnection = new RTCPeerConnection()
+                    const pc = new RTCPeerConnection();
+                    console.log(message.sdp, "inside offer")
                     pc.setRemoteDescription(message.sdp)
-                    const sdp = await pc.createAnswer()
-                    console.log(sdp, "answer sdp")
-                    pc.setLocalDescription(sdp)
+                    const newSdp = await pc.createAnswer();
+                    pc.setLocalDescription(newSdp)
                     const stream: any = new MediaStream()
-                    if (videoElement) {
-                        videoElement.srcObject = stream
+                    if (remoteVideoRef.current) {
+                        remoteVideoRef.current.srcObject = stream;
 
                     }
 
                     setRemoteMediaStream(stream)
                     setRecevingPc(pc)
+                    console.log(message.id, "id sent from offer to ice candidate")
                     pc.onicecandidate = async (can: any) => {
                         if (can.candidate) {
-                            console.log("inside offer inside onicecandidate", can.candidate)
                             ws.send(JSON.stringify({
                                 type: 'add-ice-candidate',
                                 roomId: message.roomId,
@@ -148,50 +154,82 @@ const Meet = () => {
                                 candidate: can.candidate,
                                 userType: 'receiver'
                             }))
-                            pc.addIceCandidate(can.candidate)
                         }
                     }
-                    
-                    pc.ontrack = (({ track, type }: any) => {
-                        if (type == 'auido') {
-                            //@ts-ignore
-                            videoElement.srcObject.addTrack(track)
+                    // pc.ontrack = (({ track, type }: any) => {
+                    //     if (type == 'auido') {
+                    //         //@ts-ignore
+                    //         videoElement.srcObject.addTrack(track)
+                    //     } else {
+                    //         videoElement.srcObject.addTrack(track)
+                    //     }
+                    //     //@ts-ignore
+                    //     remoteVideoRef.current.play()
+                    // })
+                    ws.send(JSON.stringify({ type: 'answer', roomId: message.roomId, sdp: newSdp, id: message.id }))
+                    setTimeout(() => {
+                        const track1 = pc.getTransceivers()[0].receiver.track
+                        const track2 = pc.getTransceivers()[1].receiver.track
+                        // console.log(track1);
+                        if (track1.kind === "video") {
+                            setRemoteAuidoTrack(track2)
+                            setRemoteVideoTrack(track1)
                         } else {
-                            videoElement.srcObject.addTrack(track)
+                            setRemoteAuidoTrack(track1)
+                            setRemoteVideoTrack(track2)
                         }
+                        console.log('Track 1 Source:', track1.label);
+                        console.log('Track 2 Source:', track2.label);
+
                         //@ts-ignore
-                        remoteVideoRef.current.play()
-                    })
-                    console.log(sdp)
-                    ws.send(JSON.stringify({ type: 'answer', roomId: message.roomId, sdp: sdp, id: message.id }))
-                    console.log('successfully sent answer req')
+                        remoteVideoRef.current.srcObject.addTrack(track1)
+                        //@ts-ignore
+                        remoteVideoRef.current.srcObject.addTrack(track2)
+                        //@ts-ignore
+                        remoteVideoRef.current.play();
+                        // if (type == 'audio') {
+                        //     // setRemoteAudioTrack(track);
+                        //     // @ts-ignore
+                        //     remoteVideoRef.current.srcObject.addTrack(track)
+                        // } else {
+                        //     // setRemoteVideoTrack(track);
+                        //     // @ts-ignore
+                        //     remoteVideoRef.current.srcObject.addTrack(track)
+                        // }
+                        // //@ts-ignore
+                    }, 5000)
                 }
 
                 if (message.type == 'answer') {
-                    console.log(message.sdp, "inside answer sdp")
-                    setSendingPc((pc: RTCPeerConnection) => {
+                    console.log(message.sdp, "inside answer")
+                    setSendingPc((pc: any) => {
                         pc.setRemoteDescription(message.sdp)
                         return pc
                     })
                 }
 
                 if (message.type == 'add-ice-candidate') {
-                    console.log("inside add-ice-candidate")
+                    console.log(message.id)
                     if (message.userType == 'sender') {
-                        console.log("add-ice-candidate")
-                        console.log(message.candidate, "message candidate")
                         setRecevingPc(pc => {
+                            if (!pc) {
+                                console.error("receicng pc nout found")
+                            } else {
+                                console.error(pc.ontrack)
+                            }
                             pc?.addIceCandidate(message.candidate)
                             return pc
                         })
-                        console.log("crossed it!")
                     } else {
-                        console.log("add-ice-candidate2")
                         setRecevingPc(pc => {
+                            if (!pc) {
+                                console.error("sending pc nout found")
+                            } else {
+                                // console.error(pc.ontrack)
+                            }
                             pc?.addIceCandidate(message.candidate)
                             return pc
                         })
-                        console.log("crossed it2!")
                     }
                 }
             }
@@ -209,8 +247,8 @@ const Meet = () => {
             router.push('/')
         }
         getPref()
-        // if (localVideoRef.current) {
-        //     localVideoRef.current.srcObject = new MediaStream([local])
+        // if (videoElement) {
+        //     videoElement.srcObject = new MediaStream([localVideoT])
         // }
     }, [])
 
@@ -400,9 +438,11 @@ const Meet = () => {
             </div>
             <div>
                 <div className='mt-8 relative w-10/12 mx-auto'>
-                    <div className='bg-gray-400 h-[80vh] flex justify-center items-center'>Recevers Video</div>
-                    <div className='bg-gray-100 h-fit absolute right-8 bottom-2 justify-center items-center flex'>
+                    <div className='bg-gray-400 h-[80vh] flex justify-center items-center'>
                         <video className='h-[25vh] aspect-auto' ref={remoteVideoRef} id="localVideo" autoPlay />
+                    </div>
+                    <div className='bg-gray-100 h-fit absolute right-8 bottom-2 justify-center items-center flex'>
+                        <video className='h-[25vh] aspect-auto' ref={localVideoRef} id="localVideo" autoPlay />
                     </div>
                 </div>
             </div>

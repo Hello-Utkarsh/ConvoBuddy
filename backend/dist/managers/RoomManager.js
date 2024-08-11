@@ -6,8 +6,8 @@ const rooms = new Map();
 const createRoom = (user1, user2) => {
     const roomId = (0, UserManager_1.generateRoomId)().toString();
     rooms.set(roomId, { user1, user2 });
-    user1.socket.send(JSON.stringify({ type: "send-offer", roomId }));
-    user2.socket.send(JSON.stringify({ type: "send-offer", roomId }));
+    user1.socket.send(JSON.stringify({ type: "send-offer", roomId, id: user1.id }));
+    user2.socket.send(JSON.stringify({ type: "send-offer", roomId, id: user2.id }));
 };
 exports.createRoom = createRoom;
 const onOffer = (roomId, senderSocketId, sdp) => {
@@ -16,9 +16,8 @@ const onOffer = (roomId, senderSocketId, sdp) => {
         return;
     }
     const recevingUser = room.user1.id === senderSocketId ? room.user2 : room.user1;
-    console.log(sdp, "sdp");
-    recevingUser.socket.send(JSON.stringify({ type: "offer", sdp, roomId, id: room.user1.id }));
-    console.log(recevingUser.id, "receive id");
+    console.log(recevingUser.id, "on offer id", senderSocketId, "sender socket id");
+    recevingUser.socket.send(JSON.stringify({ type: "offer", sdp, roomId, id: recevingUser.id }));
 };
 exports.onOffer = onOffer;
 const onAnswer = (roomId, sdp, senderSocketId) => {
@@ -26,10 +25,10 @@ const onAnswer = (roomId, sdp, senderSocketId) => {
     if (!room) {
         return;
     }
-    console.log(sdp, "roomManager sdp inside onAnswer");
-    const recevingUser = room.user1.id === senderSocketId ? room.user1 : room.user2;
+    const recevingUser = room.user1.id === senderSocketId ? room.user2 : room.user1;
+    console.log(recevingUser.id, "on answer id", senderSocketId, "sender socket id");
+    console.log(recevingUser.id, "inside answer");
     recevingUser.socket.send(JSON.stringify({ type: "answer", sdp, roomId }));
-    console.log(recevingUser.id, "sending id");
 };
 exports.onAnswer = onAnswer;
 // export const iceCandidate = (
@@ -48,15 +47,13 @@ exports.onAnswer = onAnswer;
 //     JSON.stringify({ type: "add-ice-candidate", candidate, userType })
 //   );
 // };
-const onIceCandidates = (roomId, senderSocketid, candidate, userType) => {
+const onIceCandidates = (roomId, senderSocketid, candidate, userType, from) => {
     const room = rooms.get(roomId);
-    console.log(roomId, senderSocketid, candidate, userType);
     if (!room) {
-        console.log("out of ice candidate");
         return;
     }
-    console.log(senderSocketid, "socketid in onicecandidate");
     const receivingUser = room.user1.id === senderSocketid ? room.user2 : room.user1;
-    receivingUser.socket.send(JSON.stringify({ type: "add-ice-candidate", candidate, userType }));
+    console.log(receivingUser.id, "on ice candidate id", senderSocketid, "sender socket id", from);
+    receivingUser.socket.send(JSON.stringify({ type: "add-ice-candidate", candidate, userType, id: receivingUser.id }));
 };
 exports.onIceCandidates = onIceCandidates;

@@ -11,12 +11,10 @@ wss.on("connection", function connection(ws) {
     ws.on("message", function message(data) {
         const message = JSON.parse(data);
         data = message;
-        console.log(message.type, "hello");
         if (message.type == "add-user") {
             (0, UserManager_1.addUser)(message.formData.name, ws, message.formData.interests, message.formData.userid, message.formData.languages);
         }
         if (message.type == 'offer' || message.type == 'answer' || message.type == 'add-ice-candidate') {
-            console.log("object");
             (0, UserManager_1.initHandler)(data);
         }
     });

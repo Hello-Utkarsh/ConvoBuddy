@@ -13,7 +13,6 @@ wss.on("connection", function connection(ws) {
   ws.on("message", function message(data: any) {
     const message = JSON.parse(data);
     data = message
-    console.log(message.type, "hello")
     if (message.type == "add-user") {
       addUser(
         message.formData.name,
@@ -24,7 +23,6 @@ wss.on("connection", function connection(ws) {
       );
     }
     if (message.type == 'offer' || message.type == 'answer' || message.type == 'add-ice-candidate') {
-      console.log("object")
       initHandler(data)
     }
   });

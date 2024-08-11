@@ -10,8 +10,8 @@ export const createRoom = (user1: User, user2: User) => {
   const roomId = generateRoomId().toString();
   rooms.set(roomId, { user1, user2 });
 
-  user1.socket.send(JSON.stringify({ type: "send-offer", roomId }));
-  user2.socket.send(JSON.stringify({ type: "send-offer", roomId }));
+  user1.socket.send(JSON.stringify({ type: "send-offer", roomId, id:user1.id }));
+  user2.socket.send(JSON.stringify({ type: "send-offer", roomId, id: user2.id }));
 };
 
 export const onOffer = (
@@ -23,13 +23,12 @@ export const onOffer = (
   if (!room) {
     return;
   }
+
   const recevingUser =
-    room.user1.id === senderSocketId ? room.user2 : room.user1;
-  console.log(sdp, "sdp");
+  room.user1.id === senderSocketId ? room.user2 : room.user1;
   recevingUser.socket.send(
-    JSON.stringify({ type: "offer", sdp, roomId, id: room.user1.id })
+    JSON.stringify({ type: "offer", sdp, roomId, id: recevingUser.id })
   );
-  console.log(recevingUser.id, "receive id");
 };
 
 export const onAnswer = (
@@ -42,47 +41,25 @@ export const onAnswer = (
     return;
   }
 
-  console.log(sdp, "roomManager sdp inside onAnswer")
-
   const recevingUser =
-    room.user1.id === senderSocketId ? room.user1 : room.user2;
+    room.user1.id === senderSocketId ? room.user2 : room.user1;
   recevingUser.socket.send(JSON.stringify({ type: "answer", sdp, roomId }));
-  console.log(recevingUser.id, "sending id");
 };
-
-// export const iceCandidate = (
-//   roomId: string,
-//   senderSocketid: string,
-//   candidate: any,
-//   userType: "sender" | "receiver"
-// ) => {
-//   const room = rooms.get(roomId);
-//   if (!room) {
-//     return;
-//   }
-//   const receivingUser =
-//     room.user1.id === senderSocketid ? room.user2 : room.user1;
-//   receivingUser.socket.send(
-//     JSON.stringify({ type: "add-ice-candidate", candidate, userType })
-//   );
-// };
 
 export const onIceCandidates = (
   roomId: string,
   senderSocketid: string,
   candidate: any,
-  userType: "sender" | "receiver"
+  userType: "sender" | "receiver",
 ) => {
   const room = rooms.get(roomId);
-  console.log(roomId, senderSocketid, candidate, userType)
   if (!room) {
-    console.log("out of ice candidate")
     return;
   }
 
   const receivingUser =
     room.user1.id === senderSocketid ? room.user2 : room.user1;
   receivingUser.socket.send(
-    JSON.stringify({ type: "add-ice-candidate", candidate, userType })
+    JSON.stringify({ type: "add-ice-candidate", candidate, userType, id:receivingUser.id })
   );
 };

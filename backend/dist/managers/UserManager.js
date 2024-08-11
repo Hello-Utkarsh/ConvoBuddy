@@ -53,24 +53,18 @@ const clearQueue = () => {
     if (!user1 || !user2) {
         return;
     }
-    console.log("creating room");
     const room = (0, RoomManager_1.createRoom)(user1, user2);
     clearQueue();
 };
 const initHandler = (message) => {
-    console.log("inside init");
-    console.log(message.type);
     if (message.type == "offer") {
-        console.log("inside offer");
         (0, RoomManager_1.onOffer)(message.roomId, message.id, message.sdp);
     }
     if (message.type == "answer") {
-        console.log("inside answer");
         (0, RoomManager_1.onAnswer)(message.roomId, message.sdp, message.id);
     }
     if (message.type == "add-ice-candidate") {
-        console.log("inside add-ice candidate");
-        (0, RoomManager_1.onIceCandidates)(message.roomId, message.id, message.candidate, message.userType);
+        (0, RoomManager_1.onIceCandidates)(message.roomId, message.id, message.candidate, message.userType, message.from);
     }
 };
 exports.initHandler = initHandler;
