@@ -77,9 +77,9 @@ const Meet = () => {
     const [video, setVideo]: any = useState(false)
     const [sendingPc, setSendingPc]: any = useState()
     const [recevingPc, setRecevingPc] = useState()
-    const [remateVideoTrack, setRemoteVideoTrack] = useState()
+    // const [remateVideoTrack, setRemoteVideoTrack] = useState()
     const [remoteMediaStream, setRemoteMediaStream] = useState()
-    const [remoteAuidoTrack, setRemoteAuidoTrack] = useState()
+    // const [remoteAuidoTrack, setRemoteAuidoTrack] = useState()
     const remoteVideoRef = useRef(null)
     let localVideoRef = useRef(null)
     const videoElement: any = localVideoRef.current
@@ -110,7 +110,6 @@ const Meet = () => {
                         pc.addTrack(videoElement.srcObject.getVideoTracks()[0])
                     }
 
-                    console.log(message.id, "id sent to the ice candidate from send-offer")
                     pc.onicecandidate = async (can: any) => {
                         if (can.candidate) {
                             ws.send(JSON.stringify({
@@ -132,8 +131,8 @@ const Meet = () => {
 
                 if (message.type == 'offer') {
                     const pc = new RTCPeerConnection();
-                    console.log(message.sdp, "inside offer")
-                    pc.setRemoteDescription(message.sdp)
+                    console.log(message.sdp, "where everything is fine")
+                    pc.setRemoteDescription(message.sdp).catch(err => console.log("error here"))
                     const newSdp = await pc.createAnswer();
                     pc.setLocalDescription(newSdp)
                     const stream: any = new MediaStream()
@@ -144,7 +143,6 @@ const Meet = () => {
 
                     setRemoteMediaStream(stream)
                     setRecevingPc(pc)
-                    console.log(message.id, "id sent from offer to ice candidate")
                     pc.onicecandidate = async (can: any) => {
                         if (can.candidate) {
                             ws.send(JSON.stringify({
@@ -171,15 +169,13 @@ const Meet = () => {
                         const track1 = pc.getTransceivers()[0].receiver.track
                         const track2 = pc.getTransceivers()[1].receiver.track
                         // console.log(track1);
-                        if (track1.kind === "video") {
-                            setRemoteAuidoTrack(track2)
-                            setRemoteVideoTrack(track1)
-                        } else {
-                            setRemoteAuidoTrack(track1)
-                            setRemoteVideoTrack(track2)
-                        }
-                        console.log('Track 1 Source:', track1.label);
-                        console.log('Track 2 Source:', track2.label);
+                        // if (track1.kind === "video") {
+                        //     setRemoteAuidoTrack(track2)
+                        //     setRemoteVideoTrack(track1)
+                        // } else {
+                        //     setRemoteAuidoTrack(track1)
+                        //     setRemoteVideoTrack(track2)
+                        // }
 
                         //@ts-ignore
                         remoteVideoRef.current.srcObject.addTrack(track1)
@@ -201,22 +197,18 @@ const Meet = () => {
                 }
 
                 if (message.type == 'answer') {
-                    console.log(message.sdp, "inside answer")
+                    console.log(message.sdp, "where error is there")
                     setSendingPc((pc: any) => {
-                        pc.setRemoteDescription(message.sdp)
+                        if (pc.signalingState === "have-local-offer" || pc.signalingState === "have-remote-offer") {
+                            pc.setRemoteDescription(message.sdp);
+                        }
                         return pc
                     })
                 }
 
                 if (message.type == 'add-ice-candidate') {
-                    console.log(message.id)
                     if (message.userType == 'sender') {
                         setRecevingPc(pc => {
-                            if (!pc) {
-                                console.error("receicng pc nout found")
-                            } else {
-                                console.error(pc.ontrack)
-                            }
                             pc?.addIceCandidate(message.candidate)
                             return pc
                         })

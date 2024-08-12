@@ -64,7 +64,7 @@ const initHandler = (message) => {
         (0, RoomManager_1.onAnswer)(message.roomId, message.sdp, message.id);
     }
     if (message.type == "add-ice-candidate") {
-        (0, RoomManager_1.onIceCandidates)(message.roomId, message.id, message.candidate, message.userType, message.from);
+        (0, RoomManager_1.onIceCandidates)(message.roomId, message.id, message.candidate, message.userType);
     }
 };
 exports.initHandler = initHandler;
