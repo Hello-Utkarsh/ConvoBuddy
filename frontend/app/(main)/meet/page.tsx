@@ -31,6 +31,7 @@ import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/components/ui/use-toast';
+import Image from 'next/image';
 
 const frameworks = [
     {
@@ -72,15 +73,17 @@ const Meet = () => {
 
     const { isSignedIn } = useUser()
     const router = useRouter()
+
+    // control for muting audio and video
+    const [audio, setAudio] = useState(false)
+    const [video, setVideo]: any = useState(false)
+
     const [interestOpen, setInterestOpen] = useState(false)
     const [languageOpen, setLanguageOpen] = useState(false)
-    const [video, setVideo]: any = useState(false)
     const [sendingPc, setSendingPc]: any = useState()
-    const [recevingPc, setRecevingPc] = useState()
-    // const [remateVideoTrack, setRemoteVideoTrack] = useState()
+    const [recevingPc, setRecevingPc]: any = useState()
     const [remoteMediaStream, setRemoteMediaStream] = useState()
-    // const [remoteAuidoTrack, setRemoteAuidoTrack] = useState()
-    const remoteVideoRef = useRef(null)
+    const remoteVideoRef = useRef<HTMLVideoElement>(null)
     let localVideoRef = useRef(null)
     const videoElement: any = localVideoRef.current
     const { toast } = useToast()
@@ -132,7 +135,7 @@ const Meet = () => {
                 if (message.type == 'offer') {
                     const pc = new RTCPeerConnection();
                     console.log(message.sdp, "where everything is fine")
-                    pc.setRemoteDescription(message.sdp).catch(err => console.log("error here"))
+                    pc.setRemoteDescription(message.sdp)
                     const newSdp = await pc.createAnswer();
                     pc.setLocalDescription(newSdp)
                     const stream: any = new MediaStream()
@@ -154,28 +157,10 @@ const Meet = () => {
                             }))
                         }
                     }
-                    // pc.ontrack = (({ track, type }: any) => {
-                    //     if (type == 'auido') {
-                    //         //@ts-ignore
-                    //         videoElement.srcObject.addTrack(track)
-                    //     } else {
-                    //         videoElement.srcObject.addTrack(track)
-                    //     }
-                    //     //@ts-ignore
-                    //     remoteVideoRef.current.play()
-                    // })
                     ws.send(JSON.stringify({ type: 'answer', roomId: message.roomId, sdp: newSdp, id: message.id }))
                     setTimeout(() => {
                         const track1 = pc.getTransceivers()[0].receiver.track
                         const track2 = pc.getTransceivers()[1].receiver.track
-                        // console.log(track1);
-                        // if (track1.kind === "video") {
-                        //     setRemoteAuidoTrack(track2)
-                        //     setRemoteVideoTrack(track1)
-                        // } else {
-                        //     setRemoteAuidoTrack(track1)
-                        //     setRemoteVideoTrack(track2)
-                        // }
 
                         //@ts-ignore
                         remoteVideoRef.current.srcObject.addTrack(track1)
@@ -183,24 +168,13 @@ const Meet = () => {
                         remoteVideoRef.current.srcObject.addTrack(track2)
                         //@ts-ignore
                         remoteVideoRef.current.play();
-                        // if (type == 'audio') {
-                        //     // setRemoteAudioTrack(track);
-                        //     // @ts-ignore
-                        //     remoteVideoRef.current.srcObject.addTrack(track)
-                        // } else {
-                        //     // setRemoteVideoTrack(track);
-                        //     // @ts-ignore
-                        //     remoteVideoRef.current.srcObject.addTrack(track)
-                        // }
-                        // //@ts-ignore
                     }, 5000)
                 }
 
                 if (message.type == 'answer') {
-                    console.log(message.sdp, "where error is there")
                     setSendingPc((pc: any) => {
                         if (pc.signalingState === "have-local-offer" || pc.signalingState === "have-remote-offer") {
-                            pc.setRemoteDescription(message.sdp);
+                            pc.setRemoteDescription(message.sdp)
                         }
                         return pc
                     })
@@ -208,16 +182,14 @@ const Meet = () => {
 
                 if (message.type == 'add-ice-candidate') {
                     if (message.userType == 'sender') {
-                        setRecevingPc(pc => {
+                        setRecevingPc((pc: RTCPeerConnection) => {
                             pc?.addIceCandidate(message.candidate)
                             return pc
                         })
                     } else {
-                        setRecevingPc(pc => {
+                        setRecevingPc((pc: RTCPeerConnection) => {
                             if (!pc) {
                                 console.error("sending pc nout found")
-                            } else {
-                                // console.error(pc.ontrack)
                             }
                             pc?.addIceCandidate(message.candidate)
                             return pc
@@ -239,9 +211,6 @@ const Meet = () => {
             router.push('/')
         }
         getPref()
-        // if (videoElement) {
-        //     videoElement.srcObject = new MediaStream([localVideoT])
-        // }
     }, [])
 
 
@@ -406,35 +375,38 @@ const Meet = () => {
                         </DialogHeader>
                     </DialogContent>
                 </Dialog>
-                {!video ? <Button onClick={() => {
+                <Button onClick={() => {
                     window.navigator.mediaDevices.getUserMedia({
                         video: true,
                         audio: true
                     })
                         .then(handleSuccess)
                         .catch(handleError)
-                }} className='bg-[#393E46] text-[#FFD369] mt-4'>Start</Button> :
-                    <div className='flex'>
-                        <Button onClick={() => {
-                            const videoElement: any = vidcomp.current
-                            const stream = videoElement.srcObject;
-                            const tracks = stream.getTracks();
-                            tracks.forEach((track: any) => {
-                                track.stop();
-                                setVideo(false)
-                            });
-                        }} className='bg-[#393E46] text-[#FFD369] mt-4 mx-2'>End</Button>
-                        <Button className='bg-[#393E46] text-[#FFD369] mt-4 mx-2'>Next</Button>
-                    </div>
-                }
+                }} className='bg-[#393E46] text-[#FFD369] mt-4'>Start</Button>
             </div>
             <div>
                 <div className='mt-8 relative w-10/12 mx-auto'>
-                    <div className='bg-gray-400 h-[80vh] flex justify-center items-center'>
-                        <video className='h-[25vh] aspect-auto' ref={remoteVideoRef} id="localVideo" autoPlay />
+                    <div className='bg-gray-400 h-[80vh] w-fit flex justify-center items-center mx-auto'>
+                        <video className='h-full aspect-auto' ref={remoteVideoRef} id="localVideo" autoPlay />
                     </div>
-                    <div className='bg-gray-100 h-fit absolute right-8 bottom-2 justify-center items-center flex'>
+                    <div className='bg-gray-100 h-fit absolute right-32 bottom-1 justify-center items-end flex flex-col'>
                         <video className='h-[25vh] aspect-auto' ref={localVideoRef} id="localVideo" autoPlay />
+                        {videoElement?.srcObject && <div className='relative bottom-3 mx-auto flex'>
+                            <span className='w-fit h-fit mx-2' onClick={() => {
+                                videoElement.srcObject.getAudioTracks()[0].enabled = !videoElement.srcObject.getAudioTracks()[0].enabled
+                                setAudio(!videoElement.srcObject.getAudioTracks()[0].enabled)
+                            }}>
+                                <Image width={500} height={500} alt='mic' className='w-11 rounded-full bg-slate-200 cursor-pointer px-3 py-3' src={'/mic.png'}></Image>
+                                {audio && <div className='w-11 top-5 absolute h-[2px] -rotate-45 bg-black' />}
+                            </span>
+                            <span className='w-fit h-fit mx-2' onClick={() => {
+                                videoElement.srcObject.getVideoTracks()[0].enabled = !videoElement.srcObject.getVideoTracks()[0].enabled
+                                setVideo(!videoElement.srcObject.getVideoTracks()[0].enabled)
+                            }}>
+                                <Image width={500} height={500} alt='mic' className='w-11 rounded-full bg-slate-200 cursor-pointer px-3 py-3' src={'/camera.png'}></Image>
+                                {video && <div className='w-11 top-5 absolute h-[2px] -rotate-45 bg-black' />}
+                            </span>
+                        </div>}
                     </div>
                 </div>
             </div>
