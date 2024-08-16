@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const ws_1 = require("ws");
 const UserManager_1 = require("./managers/UserManager");
-const wss = new ws_1.WebSocketServer({ port: 8080 });
+const port = parseInt(process.env.WS_PORT || '');
+const wss = new ws_1.WebSocketServer({ port: port });
 let senderSocket = null;
 let receiverSocket = null;
 wss.on("connection", function connection(ws) {

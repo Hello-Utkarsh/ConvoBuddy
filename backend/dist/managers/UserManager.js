@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.initHandler = exports.removeUser = exports.addUser = exports.generateRoomId = void 0;
 const ws_1 = require("ws");
 const RoomManager_1 = require("./RoomManager");
-const ws = new ws_1.WebSocket("ws://localhost:8080");
+const port = parseInt(process.env.WS_PORT || '');
+const ws = new ws_1.WebSocket(`ws://localhost:${port}`);
 let GLOBAL_ROOM_ID = 0;
 const users = [];
-const queue = [];
+let queue = [];
 function generateRoomId() {
     return GLOBAL_ROOM_ID++;
 }
@@ -26,11 +27,11 @@ const addUser = (name, socket, prefrence, id, languages) => __awaiter(void 0, vo
         return;
     }
     users.push({ name, socket, prefrence, id, languages });
-    if (queue.find((x) => id == x)) {
+    if (queue.find((x) => id == x.id)) {
         console.log("user exist in queue");
         return;
     }
-    queue.push(id);
+    queue.push({ id, prefrence });
     clearQueue();
     (0, exports.initHandler)(id);
 });
@@ -38,24 +39,42 @@ exports.addUser = addUser;
 const removeUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const user = users.find((x) => id === x.id);
     users.filter((x) => x.id !== (user === null || user === void 0 ? void 0 : user.id));
-    queue.filter((x) => x !== (user === null || user === void 0 ? void 0 : user.id));
+    queue.filter((x) => x.id !== (user === null || user === void 0 ? void 0 : user.id));
 });
 exports.removeUser = removeUser;
-const clearQueue = () => {
+const clearQueue = () => __awaiter(void 0, void 0, void 0, function* () {
     if (queue.length < 2) {
         console.log("not enough people");
+        console.log(queue);
         return;
     }
+    yield new Promise(resolve => setTimeout(resolve, 5000));
+    let sim = 0;
+    let id2;
     const id1 = queue.pop();
-    const id2 = queue.pop();
-    const user1 = users.find((x) => id1 === x.id);
-    const user2 = users.find((x) => id2 === x.id);
+    queue.forEach((user) => {
+        let x = 0;
+        id1 === null || id1 === void 0 ? void 0 : id1.prefrence.forEach(pref => {
+            user.prefrence.forEach(userpref => {
+                if (pref == userpref) {
+                    x++;
+                }
+            });
+            if (sim < x) {
+                id2 = user;
+            }
+        });
+    });
+    queue = queue.filter(x => x.id != id2.id);
+    const user1 = users.find((x) => (id1 === null || id1 === void 0 ? void 0 : id1.id) === x.id);
+    const user2 = users.find((x) => (id2 === null || id2 === void 0 ? void 0 : id2.id) === x.id);
     if (!user1 || !user2) {
         return;
     }
+    console.log(user1.id, user2.id);
     const room = (0, RoomManager_1.createRoom)(user1, user2);
     clearQueue();
-};
+});
 const initHandler = (message) => {
     if (message.type == "offer") {
         (0, RoomManager_1.onOffer)(message.roomId, message.id, message.sdp);

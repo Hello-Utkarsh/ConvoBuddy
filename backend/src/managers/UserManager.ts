@@ -1,7 +1,8 @@
 import { WebSocket } from "ws";
 import { createRoom, onAnswer, onIceCandidates, onOffer } from "./RoomManager";
 
-const ws = new WebSocket("ws://localhost:8080");
+const port = parseInt(process.env.WS_PORT|| '')
+const ws = new WebSocket(`ws://localhost:${port}`);
 
 let GLOBAL_ROOM_ID = 0;
 
@@ -13,7 +14,7 @@ export interface User {
   languages: string[];
 }
 const users: User[] = [];
-const queue: string[] = [];
+let queue: {id: string, prefrence: string[]}[] = [];
 
 export function generateRoomId() {
   return GLOBAL_ROOM_ID++;
@@ -27,15 +28,13 @@ export const addUser = async (
   languages: string[]
 ) => {
   if (users.find((x) => id == x.id)) {
-    console.log("user exist in users");
     return;
   }
   users.push({ name, socket, prefrence, id, languages });
-  if (queue.find((x) => id == x)) {
-    console.log("user exist in queue");
+  if (queue.find((x) => id == x.id)) {
     return;
   }
-  queue.push(id);
+  queue.push({id, prefrence});
   clearQueue();
   initHandler(id);
 };
@@ -43,18 +42,33 @@ export const addUser = async (
 export const removeUser = async (id: string) => {
   const user = users.find((x) => id === x.id);
   users.filter((x) => x.id !== user?.id);
-  queue.filter((x) => x !== user?.id);
+  queue.filter((x) => x.id !== user?.id);
 };
 
-const clearQueue = () => {
+const clearQueue = async() => {
   if (queue.length < 2) {
-    console.log("not enough people");
     return;
   }
+  await new Promise(resolve => setTimeout(resolve, 5000))
+  let sim = 0
+  let id2: any
   const id1 = queue.pop();
-  const id2 = queue.pop();
-  const user1 = users.find((x) => id1 === x.id);
-  const user2 = users.find((x) => id2 === x.id);
+  queue.forEach((user) => {
+    let x = 0
+    id1?.prefrence.forEach(pref => {
+      user.prefrence.forEach(userpref => {
+        if (pref == userpref) {
+          x++
+        }
+      })
+      if (sim < x) {
+        id2 = user
+      }
+    })
+  })
+  queue = queue.filter(x => x.id != id2.id)
+  const user1 = users.find((x) => id1?.id === x.id);
+  const user2 = users.find((x) => id2?.id === x.id);
   if (!user1 || !user2) {
     return;
   }

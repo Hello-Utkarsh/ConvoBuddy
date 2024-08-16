@@ -84,8 +84,8 @@ const Meet = () => {
     const [recevingPc, setRecevingPc]: any = useState()
     const [remoteMediaStream, setRemoteMediaStream] = useState()
     const remoteVideoRef = useRef<HTMLVideoElement>(null)
-    let localVideoRef = useRef(null)
-    const videoElement: any = localVideoRef.current
+    let localVideoRef: any = useRef(null)
+    // const localVideoRef.current: any = localVideoRef.current
     const { toast } = useToast()
     const [formData, setData]: any = useState({
         name: "",
@@ -97,7 +97,7 @@ const Meet = () => {
     function handleSuccess(stream: any) {
         formData.userid = uuidv4()
         console.log(formData.userid, "your id")
-        videoElement.srcObject = stream;
+        localVideoRef.current.srcObject = stream;
         const ws = new WebSocket('ws://localhost:8080')
         ws.onopen = () => {
             ws.send(JSON.stringify({ type: 'add-user', formData }))
@@ -106,11 +106,11 @@ const Meet = () => {
                 if (message.type == 'send-offer') {
                     const pc = new RTCPeerConnection()
                     setSendingPc(pc)
-                    if (videoElement.srcObject.getAudioTracks()[0]) {
-                        pc.addTrack(videoElement.srcObject.getAudioTracks()[0])
+                    if (localVideoRef.current.srcObject.getAudioTracks()[0]) {
+                        pc.addTrack(localVideoRef.current.srcObject.getAudioTracks()[0])
                     }
-                    if (videoElement.srcObject.getVideoTracks()[0]) {
-                        pc.addTrack(videoElement.srcObject.getVideoTracks()[0])
+                    if (localVideoRef.current.srcObject.getVideoTracks()[0]) {
+                        pc.addTrack(localVideoRef.current.srcObject.getVideoTracks()[0])
                     }
 
                     pc.onicecandidate = async (can: any) => {
@@ -141,9 +141,7 @@ const Meet = () => {
                     const stream: any = new MediaStream()
                     if (remoteVideoRef.current) {
                         remoteVideoRef.current.srcObject = stream;
-
                     }
-
                     setRemoteMediaStream(stream)
                     setRecevingPc(pc)
                     pc.onicecandidate = async (can: any) => {
@@ -158,23 +156,22 @@ const Meet = () => {
                         }
                     }
                     ws.send(JSON.stringify({ type: 'answer', roomId: message.roomId, sdp: newSdp, id: message.id }))
-                    setTimeout(() => {
-                        const track1 = pc.getTransceivers()[0].receiver.track
-                        const track2 = pc.getTransceivers()[1].receiver.track
+                    const track1 = pc.getTransceivers()[0].receiver.track
+                    const track2 = pc.getTransceivers()[1].receiver.track
 
-                        //@ts-ignore
-                        remoteVideoRef.current.srcObject.addTrack(track1)
-                        //@ts-ignore
-                        remoteVideoRef.current.srcObject.addTrack(track2)
-                        //@ts-ignore
-                        remoteVideoRef.current.play();
-                    }, 5000)
+                    //@ts-ignore
+                    remoteVideoRef.current.srcObject.addTrack(track1)
+                    //@ts-ignore
+                    remoteVideoRef.current.srcObject.addTrack(track2)
+                    //@ts-ignore
+                    remoteVideoRef.current.play();
+                    console.log("reaching here")
                 }
 
                 if (message.type == 'answer') {
                     setSendingPc((pc: any) => {
                         if (pc.signalingState === "have-local-offer" || pc.signalingState === "have-remote-offer") {
-                            pc.setRemoteDescription(message.sdp)
+                            pc.setRemoteDescription(message.sdp).catch(() => console.log(pc?.currentRemoteDescription))
                         }
                         return pc
                     })
@@ -182,28 +179,27 @@ const Meet = () => {
 
                 if (message.type == 'add-ice-candidate') {
                     if (message.userType == 'sender') {
+
                         setRecevingPc((pc: RTCPeerConnection) => {
-                            pc?.addIceCandidate(message.candidate)
-                            return pc
+                            if (pc?.signalingState != 'closed') {
+                                pc?.addIceCandidate(message.candidate)
+                                return pc
+                            }
                         })
                     } else {
                         setRecevingPc((pc: RTCPeerConnection) => {
                             if (!pc) {
                                 console.error("sending pc nout found")
                             }
-                            pc?.addIceCandidate(message.candidate)
-                            return pc
+                            if (pc?.signalingState != 'closed') {
+                                pc?.addIceCandidate(message.candidate)
+                                return pc
+                            }
                         })
                     }
                 }
             }
         }
-
-
-    }
-
-    function handleError(error: any) {
-        console.error('Error accessing media devices.', error);
     }
 
     useEffect(() => {
@@ -375,14 +371,23 @@ const Meet = () => {
                         </DialogHeader>
                     </DialogContent>
                 </Dialog>
-                <Button onClick={() => {
+                {(sendingPc && recevingPc) ? <Button onClick={() => {
+                    sendingPc.close()
+                    setSendingPc(null)
+                    recevingPc.close()
+                    setRecevingPc(null)
+                    localVideoRef.current.srcObject.getTracks().forEach((track: any) => {
+                        track.stop()
+                    })
+                }} className='bg-[#393E46] text-[#FFD369] mt-4'>End</Button> : <Button onClick={() => {
                     window.navigator.mediaDevices.getUserMedia({
                         video: true,
                         audio: true
                     })
                         .then(handleSuccess)
-                        .catch(handleError)
-                }} className='bg-[#393E46] text-[#FFD369] mt-4'>Start</Button>
+                        .catch(err => { console.error('Error accessing media devices.', err) })
+                }} className='bg-[#393E46] text-[#FFD369] mt-4'>Start</Button>}
+
             </div>
             <div>
                 <div className='mt-8 relative w-10/12 mx-auto'>
@@ -391,17 +396,17 @@ const Meet = () => {
                     </div>
                     <div className='bg-gray-100 h-fit absolute right-32 bottom-1 justify-center items-end flex flex-col'>
                         <video className='h-[25vh] aspect-auto' ref={localVideoRef} id="localVideo" autoPlay />
-                        {videoElement?.srcObject && <div className='relative bottom-3 mx-auto flex'>
+                        {localVideoRef.current?.srcObject && <div className='relative bottom-3 mx-auto flex'>
                             <span className='w-fit h-fit mx-2' onClick={() => {
-                                videoElement.srcObject.getAudioTracks()[0].enabled = !videoElement.srcObject.getAudioTracks()[0].enabled
-                                setAudio(!videoElement.srcObject.getAudioTracks()[0].enabled)
+                                localVideoRef.current.srcObject.getAudioTracks()[0].enabled = !localVideoRef.current.srcObject.getAudioTracks()[0].enabled
+                                setAudio(!localVideoRef.current.srcObject.getAudioTracks()[0].enabled)
                             }}>
                                 <Image width={500} height={500} alt='mic' className='w-11 rounded-full bg-slate-200 cursor-pointer px-3 py-3' src={'/mic.png'}></Image>
                                 {audio && <div className='w-11 top-5 absolute h-[2px] -rotate-45 bg-black' />}
                             </span>
                             <span className='w-fit h-fit mx-2' onClick={() => {
-                                videoElement.srcObject.getVideoTracks()[0].enabled = !videoElement.srcObject.getVideoTracks()[0].enabled
-                                setVideo(!videoElement.srcObject.getVideoTracks()[0].enabled)
+                                localVideoRef.current.srcObject.getVideoTracks()[0].enabled = !localVideoRef.current.srcObject.getVideoTracks()[0].enabled
+                                setVideo(!localVideoRef.current.srcObject.getVideoTracks()[0].enabled)
                             }}>
                                 <Image width={500} height={500} alt='mic' className='w-11 rounded-full bg-slate-200 cursor-pointer px-3 py-3' src={'/camera.png'}></Image>
                                 {video && <div className='w-11 top-5 absolute h-[2px] -rotate-45 bg-black' />}

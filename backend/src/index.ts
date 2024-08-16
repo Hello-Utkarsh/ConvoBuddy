@@ -1,7 +1,8 @@
 import { WebSocketServer } from "ws";
 import { addUser, initHandler, removeUser } from "./managers/UserManager";
 
-const wss = new WebSocketServer({ port: 8080 });
+const port = parseInt(process.env.WS_PORT|| '')
+const wss = new WebSocketServer({ port: port });
 
 let senderSocket: null | WebSocket = null;
 let receiverSocket: null | WebSocket = null;
