@@ -98,7 +98,8 @@ const Meet = () => {
         formData.userid = uuidv4()
         console.log(formData.userid, "your id")
         localVideoRef.current.srcObject = stream;
-        const port = process.env.WS_PORT || ''
+        const port = process.env.NEXT_PUBLIC_WS_PORT || ''
+        console.log(port)
         const ws = new WebSocket(port)
         ws.onopen = () => {
             ws.send(JSON.stringify({ type: 'add-user', formData }))

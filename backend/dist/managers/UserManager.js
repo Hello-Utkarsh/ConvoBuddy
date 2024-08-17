@@ -23,12 +23,10 @@ function generateRoomId() {
 exports.generateRoomId = generateRoomId;
 const addUser = (name, socket, prefrence, id, languages) => __awaiter(void 0, void 0, void 0, function* () {
     if (users.find((x) => id == x.id)) {
-        console.log("user exist in users");
         return;
     }
     users.push({ name, socket, prefrence, id, languages });
     if (queue.find((x) => id == x.id)) {
-        console.log("user exist in queue");
         return;
     }
     queue.push({ id, prefrence });
@@ -44,8 +42,6 @@ const removeUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
 exports.removeUser = removeUser;
 const clearQueue = () => __awaiter(void 0, void 0, void 0, function* () {
     if (queue.length < 2) {
-        console.log("not enough people");
-        console.log(queue);
         return;
     }
     yield new Promise(resolve => setTimeout(resolve, 5000));
@@ -71,7 +67,6 @@ const clearQueue = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!user1 || !user2) {
         return;
     }
-    console.log(user1.id, user2.id);
     const room = (0, RoomManager_1.createRoom)(user1, user2);
     clearQueue();
 });
