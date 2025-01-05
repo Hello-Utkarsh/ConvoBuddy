@@ -1,7 +1,7 @@
 import { WebSocket } from "ws";
 import { createRoom, onAnswer, onIceCandidates, onOffer } from "./RoomManager";
 
-const port = parseInt(process.env.WS_PORT|| '')
+const port = parseInt(process.env.WS_PORT || "");
 const ws = new WebSocket(`ws://localhost:${port}`);
 
 let GLOBAL_ROOM_ID = 0;
@@ -14,7 +14,7 @@ export interface User {
   languages: string[];
 }
 const users: User[] = [];
-let queue: {id: string, prefrence: string[]}[] = [];
+let queue: { id: string; prefrence: string[] }[] = [];
 
 export function generateRoomId() {
   return GLOBAL_ROOM_ID++;
@@ -34,7 +34,7 @@ export const addUser = async (
   if (queue.find((x) => id == x.id)) {
     return;
   }
-  queue.push({id, prefrence});
+  queue.push({ id, prefrence });
   clearQueue();
   initHandler(id);
 };
@@ -45,28 +45,15 @@ export const removeUser = async (id: string) => {
   queue.filter((x) => x.id !== user?.id);
 };
 
-const clearQueue = async() => {
+const clearQueue = async () => {
   if (queue.length < 2) {
     return;
   }
-  await new Promise(resolve => setTimeout(resolve, 5000))
-  let sim = 0
-  let id2: any
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+  let sim = 0;
   const id1 = queue.pop();
-  queue.forEach((user) => {
-    let x = 0
-    id1?.prefrence.forEach(pref => {
-      user.prefrence.forEach(userpref => {
-        if (pref == userpref) {
-          x++
-        }
-      })
-      if (sim < x) {
-        id2 = user
-      }
-    })
-  })
-  queue = queue.filter(x => x.id != id2.id)
+  const id2: any = queue.pop();
+  queue = queue.filter((x) => x.id != id2.id);
   const user1 = users.find((x) => id1?.id === x.id);
   const user2 = users.find((x) => id2?.id === x.id);
   if (!user1 || !user2) {
@@ -84,6 +71,11 @@ export const initHandler = (message: any) => {
     onAnswer(message.roomId, message.sdp, message.id);
   }
   if (message.type == "add-ice-candidate") {
-    onIceCandidates(message.roomId, message.id, message.candidate, message.userType);
+    onIceCandidates(
+      message.roomId,
+      message.id,
+      message.candidate,
+      message.userType
+    );
   }
 };
